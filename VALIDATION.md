@@ -55,7 +55,7 @@ Checkpoints from earlier adapter revisions deliberately require their original
 code. There is no checkpoint migration in this release.
 
 
-## External AI experiments — 2026-10-25 (unreleased)
+## External AI experiments — 2026-10-25 (0.2 validation)
 
 - Full macOS ARM suite after scoped server, permissions, reset tickets, cost ledger
   and SDK transport changes: **75 passed in 149.74 s**. A subsequent metric-only
@@ -79,3 +79,34 @@ code. There is no checkpoint migration in this release.
   usage, rates and artifact hashes without credentials or provider response IDs.
   Exact prompts, decisions, provider receipts and engine data stay in gitignored
   `data/experiments/ai-first-run-20261025/`.
+
+
+## 0.2 release acceptance — 2026-10-25
+
+Runtime candidate: `1aeea6fc893ac612e668263b476e85f78e363d5a`.
+Final documentation/screenshots do not change the tested runtime. Exact final
+commit/CI/archive/image provenance belongs to the draft release's attached
+`validation.json`; see [the requirement audit](docs/release-readiness.md).
+
+| Platform | Final 0.2 verification | Result |
+| --- | --- | --- |
+| macOS ARM64 | Fresh source archive, managed native Python 3.12.13/3.11.15, full suite | 105 passed in 203.94 s |
+| Linux x86_64, Ubuntu 24.04 | Clean public checkout, bootstrap, full suite, offline CLI and audit | [105 passed in 179.16 s](https://github.com/lktron00/AgentWorldLab/actions/runs/40183658456) |
+| Linux ARM64, Debian 12 | Archive-built Docker image, non-root UID 10001, full suite with networking disabled | 105 passed in 305.38 s |
+
+Additional checks cover scoped observations, hidden/duplicate repost rejection,
+operator/reset capabilities, tunneled alternate protocols, budget exhaustion,
+invalid model outputs, unresolved provider calls, journal crash recovery,
+escaped HTML, report downloads and read-only catalog paths. The offline paired
+CLI checks complete world hashes and costs zero model tokens. A real SIGTERM
+integration test confirms the report is saved and its server is stopped.
+
+Bootstrap was exercised with cached Intel Python on an ARM Mac and rejects a
+mismatched existing environment without deleting it. Raw Git-blob verification
+accepts the byte-identical upstream CRLF source and still rejects real, staged
+and untracked modifications. No upstream patch or pin change was used.
+
+Manual 0.2 browser verification includes the actual dashboard comparison,
+experiment catalog, real report, recorded example, decisions and scoped
+observations. Report/catalog layouts were checked at desktop size and 390 × 844.
+No additional paid provider calls were made for these acceptance checks.

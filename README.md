@@ -20,7 +20,7 @@ to predict people or provide a validated intelligence benchmark.
 
 ## Quick start
 
-Requires Git and [uv](https://docs.astral.sh/uv/getting-started/installation/). Supported installation targets are macOS ARM64 and Linux ARM64/x86_64; see [VALIDATION.md](VALIDATION.md) for completed platform checks. Bootstrap downloads Python 3.11/3.12, pinned upstream source and dependencies, including CPU PyTorch. Allow several GB of disk space. No API key or model download is needed to run the baseline and dashboard. A fresh install requires several GB of storage and network access to fetch dependencies; experiments then run offline unless the optional model policy is selected.
+Requires Git and [uv](https://docs.astral.sh/uv/getting-started/installation/). Supported installation targets are macOS ARM64 and Linux ARM64/x86_64; see [VALIDATION.md](VALIDATION.md) for completed platform checks. Bootstrap downloads Python 3.11/3.12, pinned upstream source and dependencies, including CPU PyTorch. Allow several GB of disk space and network access to fetch dependencies. No API key or model download is needed for the baseline and dashboard; experiments then run offline unless the optional model policy is selected.
 
 ```sh
 git clone https://github.com/lktron00/AgentWorldLab.git

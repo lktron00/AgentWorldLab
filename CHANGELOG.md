@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 — external AI experiments (prepared release)
+## 0.2.0 — external AI experiments (experimental)
 
 - Server-enforced external-agent observations and visible-post action guards;
   separate local agent/operator capabilities in a dedicated OpenEnv server.
