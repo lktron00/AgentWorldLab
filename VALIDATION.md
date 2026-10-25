@@ -110,3 +110,32 @@ Manual 0.2 browser verification includes the actual dashboard comparison,
 experiment catalog, real report, recorded example, decisions and scoped
 observations. Report/catalog layouts were checked at desktop size and 390 × 844.
 No additional paid provider calls were made for these acceptance checks.
+
+
+## Public results explorer — 2026-10-25
+
+[Public site](https://agent-world-lab-explorer.lktron.chatgpt.site) ·
+[verification record](docs/explorer-validation.json) ·
+[map semantics and reproducible build](docs/public-explorer.md).
+
+- Five Node model tests passed: bounded shared routes, deterministic finite
+  layout, exact-turn observations, branch/turn isolation for reposts and colors.
+- The public-study verifier reconciled all 41,770 study decisions and 4,000 pilot
+  decisions with the recorded costs and comparisons. The explorer builder and
+  manifest verifier checked all 102 complete pairs, 40,800 applied decisions and
+  1,796 repost events against the original observations. No new model calls.
+- Browser QA covered desktop 1440×1000 and mobile 390×844: maps, matrix, playback,
+  conditions, repetitions, URL state, account selection and the decision sheet.
+  No horizontal overflow or app console errors were observed.
+- The deployed site loaded its default pair and all three views. Independent
+  cookie-free HTTPS requests verified 15 hashed assets, including one repetition
+  from each case, the default pair, modules, CSS, presentation and share image.
+  The served HTML contains the app plus an appended hosting-provider Cloudflare
+  script; its served bytes therefore differ from the source HTML hash.
+- Published as Sites version 1 from source commit
+  `110279f9ca6dd4324bda163e89f8f339978811ae`, with public access. Only static
+  sanitized recordings are hosted; the native simulator remains on loopback.
+
+The native engine code and runtime contracts are unchanged in this addition.
+The existing GitHub workflow also runs the new frontend tests and full explorer
+verification before the real-engine integration suite.
