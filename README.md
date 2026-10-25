@@ -6,6 +6,8 @@ An open-source laboratory for reproducible multi-agent experiments. The first pr
 
 Create a community, introduce a signal, watch it spread, checkpoint the world, and compare two policies from exactly the same starting state. A local dashboard and a typed Python client use the same OpenEnv WebSocket API.
 
+![A real run in the local dashboard, comparing open diffusion and friction](docs/dashboard.png)
+
 **Status:** functional local prototype. The included agents follow explicit scripted policies. This is an integration and experimentation foundation, not a validated predictor of human behavior, an LLM benchmark, or a production service.
 
 ## Quick start
@@ -163,6 +165,7 @@ data/logs/            Controller diagnostics (gitignored)
 ## Verification
 
 ```sh
+python3 scripts/doctor.py
 ./scripts/test tests/test_contracts.py -q
 ./scripts/test tests/test_integration.py -q
 ./scripts/test -q

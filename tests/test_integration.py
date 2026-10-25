@@ -113,6 +113,10 @@ def test_real_engines_checkpoint_replay_branch_and_client(server):
                 with zipfile.ZipFile(io.BytesIO(export.content)) as archive:
                     assert "upstreams.json" in archive.namelist()
                     assert "events.jsonl" in archive.namelist()
+                    provenance = json.loads(archive.read("provenance/adapters.json"))
+                    assert "def choose_action" in provenance["sources"]["common.py"]
+                    assert len(provenance["hashes"]["common.py"]) == 64
+                    assert "oasis.txt" in json.loads(archive.read("provenance/runtime.json"))["requirements"]
         # Close destroys the runtime; the checkpoint must survive a fresh process.
         async with LabClient(base_url=url, message_timeout_s=180) as fresh:
             recovered = (await fresh.reset(checkpoint_id=checkpoint)).observation.snapshot

@@ -73,6 +73,8 @@ class Controller:
         # Capture the executing revision once; a developer editing a source file
         # while this process runs must not relabel an old world as the new code.
         self.code_hashes = self.adapter_hashes()
+        self.source_text = {name: (ROOT / "worldlab" / name).read_text() for name in self.code_hashes}
+        self.runtime_locks = {path.name: path.read_text() for path in (ROOT / "requirements").glob("*.txt")}
         self.upstreams = read_json(ROOT / "upstreams.json")
 
     async def reset(self, *, seed=7, population=20, policy=None, checkpoint_id=None, scenario=None, **kwargs):
@@ -108,7 +110,8 @@ class Controller:
         write_json(self.run_dir / "scenario.json", self.config)
         provenance = self.run_dir / "provenance"
         provenance.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / "worldlab/scripted_agent.py", provenance / "lab_agent.py")
+        write_json(provenance / "adapters.json", {"hashes": self.code_hashes, "sources": self.source_text})
+        write_json(provenance / "runtime.json", {"upstreams": self.upstreams, "requirements": self.runtime_locks})
         self.oasis = Worker(".venv-oasis", "worldlab.oasis_worker", self.run_dir / "oasis.log")
         self.oasis.call("open", database=str(self.run_dir / "oasis.sqlite"))
         if not source:

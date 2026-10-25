@@ -33,6 +33,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y build-essential libmagic1 libcairo2 libgomp1
       - name: Install immutable upstreams and isolated runtimes
         run: python3 scripts/bootstrap.py
+      - name: Verify installed engine versions and source revisions
+        run: python3 scripts/doctor.py
       - name: Contracts, failures, isolation and three real engines
         run: ./scripts/test -q --basetemp=test-results
       - name: Diagnostics on failure
