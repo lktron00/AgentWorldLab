@@ -1,0 +1,28 @@
+{
+  "url": "https://agent-world-lab-explorer.lktron.chatgpt.site",
+  "anonymous_access": true,
+  "hashed_http_assets_verified": 15,
+  "html_app_verified": true,
+  "hosting_html_addition": "Cloudflare challenge-platform script appended by host",
+  "cases": 9,
+  "pairs": 102,
+  "default_world_decisions": 400,
+  "manifest_integrity": true,
+  "tls_verification": "enabled, system curl trust store",
+  "verified_at_date": "2026-10-25",
+  "site_source_commit": "110279f9ca6dd4324bda163e89f8f339978811ae",
+  "site_version": 1,
+  "model_tests_passed": 5,
+  "complete_world_decisions": 40800,
+  "recorded_repost_routes": 1796,
+  "browser_checks": [
+    "desktop 1440x1000, mobile 390x844",
+    "original 21-node network (20 active + technical account)",
+    "recorded repost routes, no future routes at turn 1",
+    "200-cell per-condition decision matrix",
+    "condition and repetition switching, lazy pair loading",
+    "ten-turn playback and pause",
+    "mobile account picker, decision sheet, Escape close",
+    "shared URL state, no horizontal overflow, no app console errors"
+  ]
+}

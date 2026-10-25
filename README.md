@@ -11,7 +11,7 @@ Recorded examples are available without a model key or engine installation.
 owns social state. **OpenEnv** provides the external agent interface. These are
 real, pinned runtimes connected through small adapters.
 
-![The completed nine-case all-AI study recording](docs/recorded-study.png)
+[![Explore the recorded agent networks](docs/explorer-network.png)](https://agent-world-lab-explorer.lktron.chatgpt.site)
 
 **Status: experimental 0.2.** The default dashboard and baseline run offline.
 Optional OpenAI experiments use a separately configured key and explicit
@@ -22,8 +22,10 @@ The current main branch includes development after the v0.2.0 release.
 
 ## Explore the completed work without paying for models
 
+**[Open the public results explorer](https://agent-world-lab-explorer.lktron.chatgpt.site)** — no account, download, API key or engine installation. Explore the original agent networks, recorded message routes, every complete repetition and each agent’s scoped observations. The viewer works on desktop and mobile; browsing creates no model charges. [How the maps and static build work](docs/public-explorer.md).
+
 - **[Project presentation in Spanish](docs/presentacion/README.md)** — a seven-page introduction for nontechnical readers, in PDF and editable Word, with diagrams and real results.
-- **[Nine-case all-AI study](examples/recorded-study/README.md)** — 102 complete paired comparisons, all 41,770 valid decisions and 3,600 browsable decisions from the first complete pair of each case.
+- **[Nine-case all-AI study](examples/recorded-study/README.md)** — 102 complete paired comparisons, all 41,770 valid decisions; the online explorer includes all 40,800 decisions from the 102 complete pairs. The separate offline recording includes a 3,600-decision sample.
 - **[First all-AI pilot](examples/recorded-pilot/README.md)** — all 4,000 recorded Luna decisions across ten pairs, including a result with no change in initial-rumor sharing.
 - **[1,000-pair scripted campaign](examples/recorded-campaign/README.md)** — 800,000 programmed decisions with zero model API calls. Its reduction in sharing follows an explicitly imposed rule.
 
