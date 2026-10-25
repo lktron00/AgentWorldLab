@@ -92,7 +92,7 @@ class Controller:
             source = DATA / "checkpoints" / safe_id(checkpoint_id)
             validate_checkpoint(source, upstreams=self.upstreams, adapter_hashes=self.code_hashes)
         self.failed = True
-        await self.close_world()
+        await self.close_world(keep_oasis=os.environ.get("WORLDLAB_REUSE_OASIS") == "1")
         self.run_id = uuid.uuid4().hex
         self.run_dir = DATA / "runs" / self.run_id
         if source:
@@ -112,7 +112,8 @@ class Controller:
         provenance.mkdir(parents=True, exist_ok=True)
         write_json(provenance / "adapters.json", {"hashes": self.code_hashes, "sources": self.source_text})
         write_json(provenance / "runtime.json", {"upstreams": self.upstreams, "requirements": self.runtime_locks})
-        self.oasis = Worker(".venv-oasis", "worldlab.oasis_worker", self.run_dir / "oasis.log")
+        if self.oasis is None:
+            self.oasis = Worker(".venv-oasis", "worldlab.oasis_worker", self.run_dir / "oasis.log")
         self.oasis.call("open", database=str(self.run_dir / "oasis.sqlite"))
         if not source:
             self.oasis.call("seed", population=population, seed=seed,
@@ -227,13 +228,19 @@ class Controller:
         return {name: hashlib.sha256((ROOT / "worldlab" / name).read_bytes()).hexdigest()
                 for name in ("common.py", "scripted_agent.py", "controller.py", "oasis_worker.py", "checkpoints.py", "scenarios.py", "observations.py")}
 
-    async def close_world(self):
+    async def close_world(self, keep_oasis=False):
         if self.society:
             await self.society.close()
+            # The service proxy is supplied by this adapter, so we own its sink.
+            await self.proxy.replay.close()
             self.society = None
         if self.oasis:
-            self.oasis.close()
-            self.oasis = None
+            if keep_oasis:
+                # Keep only the imported interpreter, never the old social state.
+                self.oasis.call("close_world")
+            else:
+                self.oasis.close()
+                self.oasis = None
 
 
 async def main():

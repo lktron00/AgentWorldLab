@@ -1,0 +1,184 @@
+{
+  "kind": "real-engine-campaign-verification",
+  "pairs": 1000,
+  "worlds": 2000,
+  "saved_frames_verified": 18000,
+  "sqlite_worlds_checked": 2000,
+  "checkpoints": 1000,
+  "background_agent_decisions": 800000,
+  "model_calls": 0,
+  "api_cost_usd": "0.0000000000",
+  "local_compute_cost_usd": null,
+  "source_report_sha256": "91e579c7be9e537e73edfbcf8086f6720d05a92ef7f4ab2b96288c2bb4dc1351",
+  "source_journal_sha256": "8c91a237085551ce9af345dc5ec6cd6c94301faad61570a5225dc773122cc0ca",
+  "runtime_source_matches_recorded_hashes": true,
+  "summary_recomputed_from_journal": true,
+  "summary": {
+    "pairs": 1000,
+    "worlds": 2000,
+    "population_per_world": 50,
+    "background_agent_decisions": 800000,
+    "paired_runtime_seconds": 1962.456,
+    "api_cost_usd": "0.0000000000",
+    "model_calls": 0,
+    "local_compute_cost_usd": null,
+    "branches": {
+      "open": {
+        "mean": 39.043,
+        "median": 39.0,
+        "p10": 32.0,
+        "p90": 45.0,
+        "half_shared_fraction": 0.999,
+        "trajectory": [
+          {
+            "step": 0,
+            "mean": 1,
+            "p10": 1.0,
+            "p90": 1.0
+          },
+          {
+            "step": 1,
+            "mean": 3.475,
+            "p10": 3.0,
+            "p90": 4.0
+          },
+          {
+            "step": 2,
+            "mean": 7.136,
+            "p10": 6.0,
+            "p90": 9.0
+          },
+          {
+            "step": 3,
+            "mean": 12.153,
+            "p10": 10.0,
+            "p90": 14.0
+          },
+          {
+            "step": 4,
+            "mean": 17.548,
+            "p10": 15.0,
+            "p90": 20.0
+          },
+          {
+            "step": 5,
+            "mean": 23.207,
+            "p10": 19.0,
+            "p90": 27.0
+          },
+          {
+            "step": 6,
+            "mean": 28.382,
+            "p10": 24.0,
+            "p90": 33.0
+          },
+          {
+            "step": 7,
+            "mean": 33.926,
+            "p10": 28.0,
+            "p90": 40.0
+          },
+          {
+            "step": 8,
+            "mean": 39.043,
+            "p10": 32.0,
+            "p90": 45.0
+          }
+        ]
+      },
+      "friction": {
+        "mean": 7.623,
+        "median": 7.0,
+        "p10": 3.0,
+        "p90": 12.0,
+        "half_shared_fraction": 0.0,
+        "trajectory": [
+          {
+            "step": 0,
+            "mean": 1,
+            "p10": 1.0,
+            "p90": 1.0
+          },
+          {
+            "step": 1,
+            "mean": 1.499,
+            "p10": 1.0,
+            "p90": 2.0
+          },
+          {
+            "step": 2,
+            "mean": 2.109,
+            "p10": 1.0,
+            "p90": 4.0
+          },
+          {
+            "step": 3,
+            "mean": 2.819,
+            "p10": 1.0,
+            "p90": 5.0
+          },
+          {
+            "step": 4,
+            "mean": 3.559,
+            "p10": 1.0,
+            "p90": 6.0
+          },
+          {
+            "step": 5,
+            "mean": 4.434,
+            "p10": 2.0,
+            "p90": 7.0
+          },
+          {
+            "step": 6,
+            "mean": 5.379,
+            "p10": 2.0,
+            "p90": 9.0
+          },
+          {
+            "step": 7,
+            "mean": 6.494,
+            "p10": 3.0,
+            "p90": 10.0
+          },
+          {
+            "step": 8,
+            "mean": 7.623,
+            "p10": 3.0,
+            "p90": 12.0
+          }
+        ]
+      }
+    },
+    "paired_effect": {
+      "mean": 31.42,
+      "median": 32.0,
+      "p10": 24.0,
+      "p90": 39.0,
+      "positive_pairs": 1000,
+      "zero_pairs": 0,
+      "negative_pairs": 0
+    },
+    "relative_difference_of_means": 0.8047537330635454
+  },
+  "execution_segments": [
+    {
+      "started_at": "2026-10-25T10:56:04.204558+00:00",
+      "initial_pairs": 0,
+      "finished_at": "2026-10-25T11:12:45.602466+00:00",
+      "elapsed_seconds": 1001.327,
+      "completed_pairs": 1000
+    }
+  ],
+  "native_tests": {
+    "full_suite": {
+      "passed": 111,
+      "seconds": 383.45
+    },
+    "actual_sigterm_and_resume": {
+      "passed": 1,
+      "seconds": 79.45
+    }
+  },
+  "recorded_fixture_sha256": "24ff626b8b6ac69d9a0fed4f8d62dd4ec4a4e910312d33b689d12e9dbac091ac"
+}

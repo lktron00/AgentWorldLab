@@ -35,9 +35,10 @@ class OasisWorld:
                 "(post_id INTEGER PRIMARY KEY, verified INTEGER NOT NULL)"
             )
             return {"engine": "oasis", "version": "0.2.5"}
-        if cmd == "close":
+        if cmd in {"close", "close_world"}:
             if self.platform:
                 self.platform.db.close()
+                self.platform = None
             return None
         p = self.platform
         if p is None:

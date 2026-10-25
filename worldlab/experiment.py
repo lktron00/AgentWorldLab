@@ -87,14 +87,15 @@ def save_report(output, report, ledger):
 
 
 @contextmanager
-def experiment_server(output):
+def experiment_server(output, *, reuse_oasis=False):
     """Credentials are process-local and never written to reports or command lines."""
     operator, agent = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
     with socket.socket() as candidate:
         candidate.bind(("127.0.0.1", 0))
         port = candidate.getsockname()[1]
     server_env = dict(os.environ, PORT=str(port), WORLDLAB_DATA=str(output / "engine"),
-                      WORLDLAB_OPERATOR_TOKEN=operator, WORLDLAB_AGENT_TOKEN=agent)
+                      WORLDLAB_OPERATOR_TOKEN=operator, WORLDLAB_AGENT_TOKEN=agent,
+                      WORLDLAB_REUSE_OASIS="1" if reuse_oasis else "0")
     server_env.pop("OPENAI_API_KEY", None)
     server_env.pop("OPENAI_BASE_URL", None)
     url = f"http://127.0.0.1:{port}"

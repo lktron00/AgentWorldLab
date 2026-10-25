@@ -100,6 +100,26 @@ The runner starts/stops its own loopback server. `WORLDLAB_DATA` selects the
 shared data directory for the dashboard and default experiment output. See
 [AI experiments, observation permissions and cost accounting](docs/ai-experiments.md).
 
+## A concrete case with 1,000 paired experiments (development)
+
+The Nube Norte campaign follows an unverified file-loss rumor through a fictional
+storage platform. It executes 1,000 pairs, 2,000 real-engine worlds and 800,000
+scripted account decisions, then explains the mean, variation and one concrete
+message/repost history. No paid model calls are made.
+
+```sh
+./scripts/campaign --pairs 10 --output data/campaigns/first-campaign
+# Full campaign; this can take several minutes and saves each completed pair.
+./scripts/campaign --pairs 1000 --output data/campaigns/nubenorte-1000
+```
+
+Open `/campaigns` on the local server, or the saved standalone `report.html`.
+See [the scenario, interpretation, resume and costs guide](docs/campaigns.md).
+This is a programmed-rule experiment, not a calibrated prediction about people.
+The campaign feature is development after the published 0.2.0 release.
+
+![Recorded Nube Norte campaign with 1,000 paired comparisons](docs/nubenorte.png)
+
 ## External agent API
 
 Run the example while the server is running:
