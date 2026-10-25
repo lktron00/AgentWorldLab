@@ -3,6 +3,7 @@ import asyncio
 import json
 import time
 from pydantic import BaseModel, ConfigDict, Field
+from openai import APITimeoutError, APIConnectionError
 from .costs import BudgetExceeded
 from .experiment import append_decision
 from .observations import validate_agent_action
@@ -73,7 +74,14 @@ class StudyPolicy:
           'input':[{'role':'user','content':json.dumps(view,ensure_ascii=False,sort_keys=True)}],
           'tools':[TOOL],'tool_choice':{'type':'function','name':'choose_action'},
           'parallel_tool_calls':False,'reasoning':{'effort':'low'}}
-        counted=await self.provider.responses.input_tokens.count(**request)
+        # Only this non-generation request may retry; generation receipts/reservations never reset.
+        for count_attempt in range(3):
+            try:
+                counted=await self.provider.responses.input_tokens.count(**request)
+                break
+            except (APITimeoutError,APIConnectionError):
+                if count_attempt==2:raise
+                await asyncio.sleep(2**count_attempt)
         for attempt in range(3):
             if self.pacer:await self.pacer.wait(counted.input_tokens+2048)
             while True:

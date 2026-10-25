@@ -38,13 +38,14 @@ def study_frame(case,snapshot,decisions=()):
 
 
 class Saver:
-    def __init__(self,output,study,ledger):
+    def __init__(self,output,study,ledger,*,resume=False):
         self.output,self.study,self.ledger=output,study,ledger
-        self.offset=0
+        if resume and not (output/'decisions.sqlite').is_file():raise ValueError('Missing existing decision index')
+        self.offset=(output/'decisions.jsonl').stat().st_size if resume else 0
         self.db=sqlite3.connect(output/'decisions.sqlite')
         self.db.execute('PRAGMA journal_mode=WAL')
-        self.db.execute('CREATE TABLE decisions (id TEXT PRIMARY KEY,seed INTEGER,branch TEXT,step INTEGER,actor INTEGER,case_id TEXT,body TEXT,applied INTEGER NOT NULL DEFAULT 0)')
-        self.db.execute('CREATE INDEX lookup ON decisions(case_id,seed,branch,step,actor)')
+        if not resume:self.db.execute('CREATE TABLE decisions (id TEXT PRIMARY KEY,seed INTEGER,branch TEXT,step INTEGER,actor INTEGER,case_id TEXT,body TEXT,applied INTEGER NOT NULL DEFAULT 0)')
+        if not resume:self.db.execute('CREATE INDEX lookup ON decisions(case_id,seed,branch,step,actor)')
         self.db.commit()
 
     def index(self):
@@ -121,9 +122,9 @@ def prior_debit(path):
             'costs_sha256':hashlib.sha256((path/'costs.jsonl').read_bytes()).hexdigest(),'model_calls':audit['summary']['completed_calls']}
 
 
-async def execute(study,output,ledger,saver,provider,url,token,max_pairs):
+async def execute(study,output,ledger,saver,provider,url,token,max_pairs,*,start_index=0):
     pacer=TokenPacer()
-    for index in range(max_pairs):
+    for index in range(start_index,max_pairs):
         case=study['cases'][index%len(study['cases'])]
         seed=100000+index
         report={'kind':'study-case-pair','status':'running','case_id':case['id'],'case_definition':case,

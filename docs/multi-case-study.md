@@ -41,7 +41,7 @@ AgentSociety 2 schedules and persists all active accounts, OASIS owns social sta
 
 The dashboard separates each case and shows complete-pair counts, both conditions' final declared probabilities, signed Brier-error differences, and allocated API cost. The Brier score is `(declared_probability - fixture_truth)²`, averaged over active accounts and then paired repetitions. Lower is better; a positive diagnostic-minus-generic difference means the attachment increased error in that experiment. The score is computed by the evaluator and is not a model reward or input.
 
-The score describes model judgments against a known synthetic state. It does not validate human behavior, real-world incident rates or calibrated probabilities. Network topology has the base adapter's limited patterns, and both branches independently sample the same model family. Initial messages and private clues are fixture conditions. New post content is inspectable but not independently semantically labeled true or false.
+The score describes model judgments against a known synthetic state. It does not validate human behavior, real-world incident rates or calibrated probabilities. Network topology has the base adapter's three limited patterns. The seed schedule advances by nine for a case, so each case retains one topology across its repetitions; comparisons across cases also change the domain, prompt and topology. Both conditions within a pair share the same topology and independently sample the same model family. Accounts within a world influence each other, so decision counts are not counts of independent replicates; the paired world is the repetition unit. Initial messages and private clues are fixture conditions. New post content is inspectable but not independently semantically labeled true or false.
 
 The study maintains append-only `decisions.jsonl` and `costs.jsonl` journals. A derived `decisions.sqlite` index provides fast case/seed/condition/turn/account filtering. The index can be queried while the study runs and downloaded after its WAL is checkpointed at shutdown. Rows distinguish applied actions from uncommitted proposals. An incomplete final pair is preserved but excluded from paired aggregate outcomes. This also makes budget censoring explicit rather than treating unfinished trajectories as completed experiments.
 
@@ -58,3 +58,12 @@ At shutdown the offline auditor independently reconciles original provider reque
 ```
 
 Full local data stays under the ignored study directory. Source snapshots and upstream/dependency pins are retained with the execution. Do not delete, restart or bypass a cost ledger to reclaim reservations. Keep the native server on loopback until production authentication and tenant isolation exist.
+
+
+## Recovering a stopped run
+
+`./scripts/study-resume --output data/studies/nine-cases-10usd` accepts only a failed or interrupted study with a completely reconciled, untruncated journal and unchanged case definitions, prompts, model and prices. It audits the dataset first, restores the confirmed spend and contexts from the existing ledger, reuses the existing SQLite index, and continues at the next scheduled case/seed. It never creates a fresh budget. A writer lock prevents two resume processes.
+
+The interrupted pair and its paid, unapplied proposals remain in the dataset and stay excluded from paired aggregates. Resumption metadata retains the prior report, audit, server log, ledger hash and a fresh source snapshot under `resumptions/`. The original source snapshot remains intact. While running again, the prior audit is archived so it cannot be mistaken for the final full audit.
+
+The [input-count endpoint](https://developers.openai.com/api/docs/guides/token-counting) counts the request before sending it to the model. After an input-count endpoint timeout, the same count-only request can retry twice before any generation reservation. Model generation still has SDK retries disabled. A generation without a usage receipt blocks resumption; its reservation must be reconciled rather than assumed free.

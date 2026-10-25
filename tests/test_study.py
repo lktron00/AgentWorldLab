@@ -49,6 +49,7 @@ def test_two_cases_reuse_shared_budget_real_engines_and_index(tmp_path):
            'previous_pilot':{'path':str(previous),'cost_usd':'0.0001500000','costs_sha256':hashlib.sha256((previous/'costs.jsonl').read_bytes()).hexdigest()},'cumulative_budget_usd':'10'}
     saver=Saver(tmp_path,study,ledger)
     async def exercise(url,token):
+        nonlocal ledger,saver
         for index,case in enumerate(study['cases']):
             r={'status':'running','case_id':case['id'],'case_definition':case,'requested_pairs':1,
                'config':{'population':4,'steps':2,'start_seed':777+index},'experiments':[],'decisions':0}
@@ -56,6 +57,13 @@ def test_two_cases_reuse_shared_budget_real_engines_and_index(tmp_path):
             await run_pair(r,tmp_path,StudyPolicy(provider,ledger,case,tmp_path),ledger,url,token,
                 concurrency=4,case=case,save_fn=saver,frame_fn=lambda s,d=():study_frame(case,s,d))
             saver()
+            if index==0:
+                before=ledger.spent
+                saver.close()
+                from worldlab.study_resume import reopen_ledger
+                ledger=reopen_ledger(tmp_path/'costs.jsonl')
+                assert ledger.spent==before
+                saver=Saver(tmp_path,study,ledger,resume=True)
     try:
         with experiment_server(tmp_path,reuse_oasis=True,society=True) as (url,token,_):asyncio.run(exercise(url,token))
         assert study['progress']['completed_pairs']==2 and study['progress']['applied_decisions']==32
@@ -91,3 +99,48 @@ def test_actual_study_routes_and_sqlite_filters(tmp_path,monkeypatch):
         assert client.get('/studies/fixture').status_code==200
         assert client.get('/lab/studies/fixture/files/decisions.sqlite').status_code==409
         assert client.get('/lab/studies/fixture/files/.env').status_code==404
+
+
+def test_resume_keeps_spend_and_blocks_unresolved_usage(tmp_path):
+    from worldlab.study_resume import reopen_ledger
+    from worldlab.costs import BudgetExceeded
+    path=tmp_path/'costs.jsonl'
+    ledger=CostLedger(path,'0.002',max_in_flight=4)
+    call=ledger.reserve('gpt-6-luna',1000,2048,{'seed':7,'branch':'generic'})
+    ledger.received(call,'gpt-6-luna',{'id':'resp_resume_fixture','model':'gpt-6-luna',
+        'service_tier':'default','usage':{'input_tokens':1000,'output_tokens':100}},1)
+    reopened=reopen_ledger(path)
+    assert reopened.summary()==ledger.summary()
+    assert reopened.contexts[call]==ledger.contexts[call]
+    assert sum(json.loads(line)['event']=='ledger' for line in path.read_text().splitlines())==1
+    with pytest.raises(BudgetExceeded):reopened.reserve('gpt-6-luna',10000,2048,{})
+    pending=reopened.reserve('gpt-6-luna',1000,2048,{})
+    reopened.uncertain(pending,'APITimeoutError')
+    with pytest.raises(ValueError,match='unresolved'):reopen_ledger(path)
+
+
+@pytest.mark.parametrize('failures',[1,3])
+def test_input_count_timeout_never_duplicates_generation(tmp_path,monkeypatch,failures):
+    import httpx
+    from openai import APITimeoutError
+    monkeypatch.setattr('worldlab.study_policy.asyncio.sleep',AsyncMock())
+    timeout=APITimeoutError(request=httpx.Request('POST','https://api.openai.com/v1/responses/input_tokens'))
+    count=AsyncMock(side_effect=[timeout]*failures+[SimpleNamespace(input_tokens=1000)])
+    d={'kind':'wait','content':'','post_id':None,'reason':'Offline retry fixture','belief_problem':50,
+       'evidence_assessment':'insufficient','evidence_refs':[]}
+    body={'id':'resp_count_retry_fixture','model':'gpt-6-luna','status':'completed','service_tier':'default',
+          'usage':{'input_tokens':1000,'output_tokens':100},
+          'output':[{'type':'function_call','name':'choose_action','arguments':json.dumps(d)}]}
+    create=AsyncMock(return_value=SimpleNamespace(model_dump=lambda **kwargs:copy.deepcopy(body)))
+    provider=SimpleNamespace(responses=SimpleNamespace(input_tokens=SimpleNamespace(count=count),create=create))
+    ledger=CostLedger(tmp_path/'costs.jsonl','1')
+    policy=StudyPolicy(provider,ledger,CASES[0],tmp_path)
+    observation={'view':'study-agent-v1','self':{'id':1},'feed':[],'own_posts':[],'checks':[],'memory':[]}
+    if failures==3:
+        with pytest.raises(APITimeoutError):asyncio.run(policy.decide(observation))
+        create.assert_not_awaited()
+        assert ledger.summary()['completed_calls']==0 and not ledger.pending
+    else:
+        action,receipt=asyncio.run(policy.decide(observation))
+        assert action.kind=='wait' and count.await_count==2 and create.await_count==1
+        assert ledger.summary()['completed_calls']==1 and not ledger.pending
