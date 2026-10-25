@@ -67,3 +67,12 @@ Full local data stays under the ignored study directory. Source snapshots and up
 The interrupted pair and its paid, unapplied proposals remain in the dataset and stay excluded from paired aggregates. Resumption metadata retains the prior report, audit, server log, ledger hash and a fresh source snapshot under `resumptions/`. The original source snapshot remains intact. While running again, the prior audit is archived so it cannot be mistaken for the final full audit.
 
 The [input-count endpoint](https://developers.openai.com/api/docs/guides/token-counting) counts the request before sending it to the model. After an input-count endpoint timeout, the same count-only request can retry twice before any generation reservation. Model generation still has SDK retries disabled. A generation without a usage receipt blocks resumption; its reservation must be reconciled rather than assumed free.
+
+
+## Recorded validation
+
+The full source suite passed **127 tests** in 359.70 seconds after the recovery change, without paid model calls. A dated, explicitly provisional snapshot is saved in `docs/study-progress-validation.json`; `docs/study-running.png` shows the running dashboard.
+
+An offline audit verified the first nine pairs (3,600 model decisions, 18 OASIS worlds and 198 engine frames). After a later input-count timeout, another audit verified 9,379 provider responses and US$2.9288145750 cumulative usage. It identified 19 paid proposals from an uncommitted tick. Those proposals remain inspectable and labeled, and resumption preserves the original budget ledger. The native viewer was checked on that tick: 19 registered proposals, zero applied actions.
+
+These are historical progress checks, not the finished study. The active process continues under the US$10 cumulative cap and writes its final `audit.json` after stopping with fully reconciled usage. Read the current local report for the latest status and totals.

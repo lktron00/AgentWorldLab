@@ -1,0 +1,432 @@
+{
+  "kind": "study-progress-validation",
+  "final": false,
+  "snapshot_at": "2026-10-25T13:44:28.485088+00:00",
+  "status_at_snapshot": "running",
+  "source_commit": "84fa0b16f8d752cfaf91514b63bfd283b8d6e2ce",
+  "dashboard": "http://127.0.0.1:8765/studies/nine-cases-10usd",
+  "dataset_path": "/Users/dan/Documents/Codebase/AgentWorldLab/data/studies/nine-cases-10usd",
+  "budget_total_usd": "10.0000000000",
+  "progress_snapshot": {
+    "completed_pairs": 26,
+    "decisions": 10859,
+    "applied_decisions": 10840,
+    "model_calls": 10859,
+    "cases_with_completed_pairs": 9
+  },
+  "cost_snapshot": {
+    "additional": {
+      "currency": "USD",
+      "estimated_cost_usd": "2.4079761500",
+      "budget_usd": "9.1263119750",
+      "completed_calls": 10859,
+      "unresolved_calls": 0,
+      "unresolved_reserved_usd": "0.0000000000",
+      "accounting": "estimated_from_reported_usage",
+      "input_tokens": 15690231,
+      "output_tokens": 1093271,
+      "reasoning_tokens": 2116
+    },
+    "previous_pilot_usd": "0.8736880250",
+    "total_confirmed_usd": "3.2816641750",
+    "total_maximum_exposure_usd": "3.2816641750",
+    "cumulative_budget_usd": "10.0000000000"
+  },
+  "summary_snapshot": [
+    {
+      "case_id": "cloud-index",
+      "title": "Carpetas ocultas por un índice atrasado",
+      "pairs": 3,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 10.583333333333334,
+          "mean_brier": 0.012741666666666667,
+          "action_counts": {
+            "inspect_record": 65,
+            "inspect_status": 72,
+            "wait": 429,
+            "post": 15,
+            "repost": 19
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 10.450000000000001,
+          "mean_brier": 0.012015000000000001,
+          "action_counts": {
+            "inspect_record": 63,
+            "inspect_status": 77,
+            "wait": 423,
+            "post": 6,
+            "repost": 31
+          }
+        }
+      },
+      "mean_paired_brier_difference": -0.0007266666666666659,
+      "diagnosis_better": 2,
+      "tied": 0,
+      "diagnosis_worse": 1,
+      "cost_usd": "0.2726050750"
+    },
+    {
+      "case_id": "cloud-deletion",
+      "title": "Borrado real sin copia recuperable",
+      "pairs": 3,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 47.233333333333334,
+          "mean_brier": 0.3068166666666667,
+          "action_counts": {
+            "inspect_record": 61,
+            "inspect_status": 66,
+            "post": 47,
+            "wait": 394,
+            "repost": 32
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 43.43333333333333,
+          "mean_brier": 0.32991000000000004,
+          "action_counts": {
+            "inspect_record": 61,
+            "inspect_status": 68,
+            "post": 62,
+            "wait": 379,
+            "repost": 30
+          }
+        }
+      },
+      "mean_paired_brier_difference": 0.023093333333333327,
+      "diagnosis_better": 1,
+      "tied": 0,
+      "diagnosis_worse": 2,
+      "cost_usd": "0.2550662000"
+    },
+    {
+      "case_id": "cloud-stale",
+      "title": "Un reporte antiguo tranquiliza durante un borrado real",
+      "pairs": 3,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 46.8,
+          "mean_brier": 0.31766333333333335,
+          "action_counts": {
+            "inspect_status": 63,
+            "inspect_record": 62,
+            "post": 53,
+            "wait": 382,
+            "repost": 40
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 48.36666666666667,
+          "mean_brier": 0.2790166666666667,
+          "action_counts": {
+            "inspect_status": 66,
+            "inspect_record": 62,
+            "wait": 381,
+            "post": 50,
+            "repost": 41
+          }
+        }
+      },
+      "mean_paired_brier_difference": -0.03864666666666668,
+      "diagnosis_better": 2,
+      "tied": 0,
+      "diagnosis_worse": 1,
+      "cost_usd": "0.2656938000"
+    },
+    {
+      "case_id": "billing-hold",
+      "title": "Una autorización parece un segundo cobro",
+      "pairs": 3,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 12.683333333333334,
+          "mean_brier": 0.026548333333333334,
+          "action_counts": {
+            "inspect_record": 62,
+            "inspect_status": 49,
+            "wait": 437,
+            "post": 35,
+            "repost": 17
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 10.666666666666668,
+          "mean_brier": 0.015686666666666668,
+          "action_counts": {
+            "inspect_record": 61,
+            "inspect_status": 54,
+            "post": 38,
+            "wait": 424,
+            "repost": 23
+          }
+        }
+      },
+      "mean_paired_brier_difference": -0.010861666666666667,
+      "diagnosis_better": 2,
+      "tied": 0,
+      "diagnosis_worse": 1,
+      "cost_usd": "0.2381564000"
+    },
+    {
+      "case_id": "billing-double",
+      "title": "Dos cobros definitivos del mismo pedido",
+      "pairs": 3,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 92.16666666666667,
+          "mean_brier": 0.016353333333333334,
+          "action_counts": {
+            "inspect_record": 61,
+            "inspect_status": 26,
+            "post": 75,
+            "wait": 406,
+            "repost": 32
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 95.71666666666667,
+          "mean_brier": 0.006721666666666667,
+          "action_counts": {
+            "inspect_record": 60,
+            "inspect_status": 27,
+            "post": 70,
+            "wait": 401,
+            "repost": 42
+          }
+        }
+      },
+      "mean_paired_brier_difference": -0.009631666666666669,
+      "diagnosis_better": 3,
+      "tied": 0,
+      "diagnosis_worse": 0,
+      "cost_usd": "0.2725103500"
+    },
+    {
+      "case_id": "billing-small-sample",
+      "title": "Una muestra mínima no resuelve la alarma de cobros",
+      "pairs": 2,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 14.325000000000001,
+          "mean_brier": 0.0272725,
+          "action_counts": {
+            "inspect_record": 46,
+            "inspect_status": 41,
+            "post": 22,
+            "wait": 280,
+            "repost": 11
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 15.774999999999999,
+          "mean_brier": 0.0313075,
+          "action_counts": {
+            "inspect_record": 54,
+            "inspect_status": 42,
+            "wait": 263,
+            "post": 30,
+            "repost": 11
+          }
+        }
+      },
+      "mean_paired_brier_difference": 0.004035,
+      "diagnosis_better": 1,
+      "tied": 0,
+      "diagnosis_worse": 1,
+      "cost_usd": "0.1942491250"
+    },
+    {
+      "case_id": "security-false-positive",
+      "title": "Una alerta del escáner con artefacto íntegro",
+      "pairs": 3,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 33.75,
+          "mean_brier": 0.12454166666666666,
+          "action_counts": {
+            "inspect_record": 61,
+            "inspect_status": 79,
+            "post": 58,
+            "wait": 399,
+            "repost": 3
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 21.983333333333334,
+          "mean_brier": 0.056771666666666665,
+          "action_counts": {
+            "inspect_record": 61,
+            "inspect_status": 65,
+            "post": 72,
+            "wait": 381,
+            "repost": 21
+          }
+        }
+      },
+      "mean_paired_brier_difference": -0.06777,
+      "diagnosis_better": 3,
+      "tied": 0,
+      "diagnosis_worse": 0,
+      "cost_usd": "0.2755161500"
+    },
+    {
+      "case_id": "security-modified",
+      "title": "El paquete descargado no coincide con el manifiesto firmado",
+      "pairs": 3,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 79.33333333333333,
+          "mean_brier": 0.056433333333333335,
+          "action_counts": {
+            "inspect_record": 60,
+            "inspect_status": 50,
+            "post": 125,
+            "wait": 338,
+            "repost": 27
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 92.13333333333333,
+          "mean_brier": 0.011330000000000003,
+          "action_counts": {
+            "inspect_record": 61,
+            "inspect_status": 43,
+            "post": 104,
+            "wait": 356,
+            "repost": 36
+          }
+        }
+      },
+      "mean_paired_brier_difference": -0.045103333333333336,
+      "diagnosis_better": 3,
+      "tied": 0,
+      "diagnosis_worse": 0,
+      "cost_usd": "0.3146235000"
+    },
+    {
+      "case_id": "security-wrong-version",
+      "title": "Una auditoría de otra versión contradice la alerta actual",
+      "pairs": 3,
+      "by_branch": {
+        "generic": {
+          "mean_probability": 78.16666666666667,
+          "mean_brier": 0.05795666666666667,
+          "action_counts": {
+            "inspect_status": 60,
+            "inspect_record": 60,
+            "post": 109,
+            "wait": 336,
+            "repost": 35
+          }
+        },
+        "diagnostic": {
+          "mean_probability": 83.26666666666667,
+          "mean_brier": 0.03776,
+          "action_counts": {
+            "inspect_record": 61,
+            "inspect_status": 52,
+            "wait": 351,
+            "post": 91,
+            "repost": 45
+          }
+        }
+      },
+      "mean_paired_brier_difference": -0.02019666666666667,
+      "diagnosis_better": 3,
+      "tied": 0,
+      "diagnosis_worse": 0,
+      "cost_usd": "0.3195555500"
+    }
+  ],
+  "tests": {
+    "command": "./scripts/test -q",
+    "passed": 127,
+    "elapsed_seconds": 359.7,
+    "paid_model_calls": 0
+  },
+  "first_cycle_audit": {
+    "verified": true,
+    "basis": "Offline reconstruction; no model calls",
+    "model": "gpt-6-luna",
+    "scope": {
+      "complete_pairs": 9,
+      "valid_decisions": 3600,
+      "applied_decisions": 3600,
+      "unapplied_proposals": 0,
+      "invalid_paid_proposals": 0,
+      "distinct_provider_responses": 3600,
+      "engine_frames": 198,
+      "oasis_databases": 18
+    },
+    "cost": {
+      "currency": "USD",
+      "estimated_cost_usd": "0.8062214000",
+      "budget_usd": "9.1263119750",
+      "completed_calls": 3600,
+      "unresolved_calls": 0,
+      "unresolved_reserved_usd": "0.0000000000",
+      "accounting": "estimated_from_reported_usage",
+      "input_tokens": 5253964,
+      "output_tokens": 364091,
+      "reasoning_tokens": 464
+    },
+    "previous_pilot_usd": "0.8736880250",
+    "total_confirmed_usd": "1.6799094250",
+    "peak_confirmed_plus_reserved_usd": "1.6914640250",
+    "auditor_sha256": "ebceb53ac464977e720cd4d8267abbd5713bbbc1bc8a4db28d4d46a2ca088cc7"
+  },
+  "audited_interruption": {
+    "verified": true,
+    "basis": "Offline reconstruction; no model calls",
+    "model": "gpt-6-luna",
+    "scope": {
+      "complete_pairs": 23,
+      "valid_decisions": 9379,
+      "applied_decisions": 9360,
+      "unapplied_proposals": 19,
+      "invalid_paid_proposals": 0,
+      "distinct_provider_responses": 9379,
+      "engine_frames": 515,
+      "oasis_databases": 47
+    },
+    "cost": {
+      "currency": "USD",
+      "estimated_cost_usd": "2.0551265500",
+      "budget_usd": "9.1263119750",
+      "completed_calls": 9379,
+      "unresolved_calls": 0,
+      "unresolved_reserved_usd": "0.0000000000",
+      "accounting": "estimated_from_reported_usage",
+      "input_tokens": 13386548,
+      "output_tokens": 937440,
+      "reasoning_tokens": 1725
+    },
+    "previous_pilot_usd": "0.8736880250",
+    "total_confirmed_usd": "2.9288145750",
+    "peak_confirmed_plus_reserved_usd": "2.9434500750",
+    "auditor_sha256": "ebceb53ac464977e720cd4d8267abbd5713bbbc1bc8a4db28d4d46a2ca088cc7"
+  },
+  "recovery": {
+    "resumptions": 1,
+    "unapplied_proposals_preserved": 19,
+    "same_generation_ledger": true,
+    "latest_runtime_sources_match_snapshot": true
+  },
+  "ui_checks": {
+    "case_seed_condition_turn_account_filters": true,
+    "interrupted_tick": "19 registered decisions, 0 applied; each marked as an unapplied proposal"
+  },
+  "artifact_sha256": {
+    "provenance.json": "21d83f822dd92eb6e0316806cb5912807ebf050f631679bf238cc8af9ef6da65",
+    "resumptions/001/provenance.json": "1d6e00417ffd043e2f083d0d5df590aeeb059989b0eb8cbeafcbce8af4759d2b",
+    "resumptions/001/prior-audit.json": "c340a8f85501c0cb529d425219acbbd4513b6d98cf0af124ea565a4a8924b47e"
+  },
+  "limitations": [
+    "Study still running; this is a progress snapshot, not its final audit.",
+    "The process writes audit.json when it finishes with fully reconciled usage.",
+    "Cost is provider-reported token usage at recorded rates; excludes tax, infrastructure and Codex credits.",
+    "Synthetic cases and model decisions do not validate human behavior."
+  ]
+}
