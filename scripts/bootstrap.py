@@ -15,6 +15,23 @@ def run(*args, cwd=ROOT):
     subprocess.run(args, cwd=cwd, check=True, timeout=1200)
 
 
+def python_request(version, system, machine):
+    architecture = "aarch64" if machine in {"arm64", "aarch64"} else "x86_64"
+    operating_system, libc = ("macos", "none") if system == "Darwin" else ("linux", "gnu")
+    return f"cpython-{version}-{operating_system}-{architecture}-{libc}"
+
+
+def check_runtime(python, version, expected_machine):
+    code = "import json,platform,sys; print(json.dumps({'machine':platform.machine(),'version':list(sys.version_info[:2])}))"
+    info = json.loads(subprocess.check_output([str(python), "-c", code], text=True, timeout=20))
+    normalize = lambda value: "aarch64" if value in {"arm64", "aarch64"} else value
+    if (normalize(info["machine"]) != normalize(expected_machine)
+            or info["version"] != [int(part) for part in version.split(".")]):
+        raise SystemExit(f"{python} uses {info['machine']} Python {info['version']}; expected {expected_machine} Python {version}. "
+                         "Preserve or move this incompatible environment before rerunning bootstrap; it was not deleted.")
+    return info
+
+
 def main():
     system, machine = platform.system(), platform.machine()
     if not ((system == "Darwin" and machine == "arm64") or
@@ -57,10 +74,17 @@ def main():
             if dirty:
                 print("Changed upstream paths (no contents):\n" + dirty, flush=True)
             raise SystemExit(f"{source} differs from its pinned revision. Preserve your edits before reinstalling.")
-        run(uv, "python", "install", spec["python"])
+        request = python_request(spec["python"], system, machine)
+        # A bare 3.12 request can select a cached Intel interpreter on Apple
+        # Silicon even with an ARM uv. Select architecture/libc explicitly and
+        # never replace the user's global Python command links.
+        run(uv, "python", "install", "--no-bin", request)
+        interpreter = subprocess.check_output([uv, "python", "find", "--managed-python", request], text=True).strip()
+        check_runtime(interpreter, spec["python"], machine)
         environment = ROOT / spec["environment"]
         if not environment.exists():
-            run(uv, "venv", "--python", spec["python"], str(environment))
+            run(uv, "venv", "--python", interpreter, str(environment))
+        check_runtime(environment / "bin/python", spec["python"], machine)
         run(uv, "pip", "install", "--python", str(environment / "bin/python"),
             "-r", str(ROOT / "requirements" / f"{name}.txt"))
     print("\nReady: ./scripts/serve → http://127.0.0.1:8765")
