@@ -21,6 +21,7 @@ WORKDIR /app
 COPY upstreams.json ./
 COPY requirements ./requirements
 COPY scripts/bootstrap.py ./scripts/bootstrap.py
+COPY worldlab/__init__.py worldlab/source_integrity.py ./worldlab/
 RUN --mount=type=cache,target=/root/.cache/uv python scripts/bootstrap.py
 COPY . .
 ARG VCS_REF=unknown

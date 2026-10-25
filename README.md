@@ -31,7 +31,7 @@ python3 scripts/bootstrap.py
 
 On Debian/Ubuntu, install native libraries first:
 `sudo apt-get install build-essential libmagic1 libcairo2 libgomp1`. On Apple Silicon, use a
-native ARM build of uv; bootstrap detects an Intel-only installation.
+native ARM build of uv; bootstrap selects the ARM interpreter explicitly and rejects incompatible existing environments without deleting them.
 
 With Docker Compose, use `docker compose up --build` from the cloned repository.
 The first build downloads the same pinned dependencies; subsequent starts reuse

@@ -15,6 +15,11 @@
   and an evidence-bearing synthetic scenario.
 - Actionable CLI errors, graceful SIGTERM handling and full-trajectory hashes
   in the offline self-check. Reports include application/source provenance.
+- Bootstrap selects explicit architecture/libc Python requests without replacing
+  global command links. It rejects incompatible existing environments safely.
+- Source verification compares raw Git blobs, including file modes and staged/
+  untracked changes, avoiding upstream CRLF normalization false positives without
+  patching upstream files or weakening pin validation.
 - External account now follows accounts 1 and 2. This adapter change invalidates
   v0.1.0 checkpoints; keep that release to restore earlier experiments.
 

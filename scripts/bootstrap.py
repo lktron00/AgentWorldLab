@@ -4,10 +4,13 @@ import json
 import platform
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from worldlab.source_integrity import source_changes
 
 
 def run(*args, cwd=ROOT):
@@ -68,7 +71,7 @@ def main():
                 shutil.rmtree(staging, ignore_errors=True)
                 raise
         revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=source, text=True).strip()
-        dirty = subprocess.check_output(["git", "status", "--porcelain"], cwd=source, text=True).strip()
+        dirty = "\n".join(source_changes(source, spec["commit"]))
         if revision != spec["commit"] or dirty:
             print(f"Expected source revision: {spec['commit']}; found: {revision}", flush=True)
             if dirty:
