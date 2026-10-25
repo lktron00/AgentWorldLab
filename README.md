@@ -57,6 +57,24 @@ The default world contains 20 scripted agents plus external agent 0. A seeded di
 
 The verification flag is a **scenario annotation**, not fact-checking. No language model judges text, and no scientific or reward claim is attached to that flag. Reward is left unset. Metrics count unique accounts that **shared** content, not exposure, beliefs or persuasion.
 
+## External AI experiment (optional API usage)
+
+The one-command runner now connects an external OpenAI policy through a
+server-enforced, agent-scoped view and compares it with a deterministic
+visible-feed baseline from the exact same checkpoint. Both branches use the
+same background policy. Per-decision tokens, estimated USD cost, decisions and
+paired trajectories are saved. The normal demo remains offline.
+
+```sh
+# Set OPENAI_API_KEY in a private, gitignored .env first.
+./scripts/experiment --seeds 7 8 9 --steps 5 --budget-usd 0.10
+# No key/cost: run the deterministic policy on both sides as a self-check.
+./scripts/experiment --policy baseline --seeds 7 --steps 3
+```
+
+The runner starts/stops its own loopback server. See
+[AI experiments, observation permissions and cost accounting](docs/ai-experiments.md).
+
 ## External agent API
 
 Run the example while the server is running:
@@ -88,7 +106,7 @@ asyncio.run(main())
 
 Actions: `wait`, `post(content, verified=False)`, `repost(post_id)`. Each action advances the society by one simulated minute. The caller always controls agent 0; it cannot impersonate the other accounts. Replace the example's policy selection with any agent system. The supplied runtime itself never calls an LLM.
 
-Observations currently expose the **whole world for experiment debugging**. They are not a restricted-information evaluation interface. One client controls one world; several clients do not automatically share a society.
+The dashboard server exposes the **whole world for experiment debugging**. Use the dedicated `scripts/experiment` runner for scoped observations and separate agent/operator capabilities. One client controls one world; several clients do not automatically share a society.
 
 OpenEnv wire protocol at `/ws`:
 
@@ -176,8 +194,6 @@ Integration tests start a local TCP server, connect the real `EnvClient`, schedu
 
 ## Next increments
 
-- Pluggable LLM policy alongside the deterministic baseline; record prompts, model identity, cost and decisions.
-- Agent-scoped observations and permissions, separate experiment operator credentials.
 - Multiple external agents in one shared world, with an explicit simultaneous-action contract.
 - Scenario packages beyond social diffusion; benchmark against observed data before claiming realism.
 - Scalable shared worker infrastructure and additional platform coverage.

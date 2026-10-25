@@ -1,0 +1,150 @@
+{
+  "validation_date": "2026-10-25",
+  "provider": "OpenAI Responses API",
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "config": {
+    "seeds": [
+      7,
+      8
+    ],
+    "population": 20,
+    "warmup": 2,
+    "steps": 3
+  },
+  "cost": {
+    "currency": "USD",
+    "estimated_cost_usd": "0.0004773000",
+    "budget_usd": "0.1000000000",
+    "completed_calls": 6,
+    "unresolved_calls": 0,
+    "unresolved_reserved_usd": "0.0000000000",
+    "accounting": "estimated_from_reported_usage",
+    "input_tokens": 3358,
+    "output_tokens": 283,
+    "reasoning_tokens": 0
+  },
+  "price_book": {
+    "currency": "USD",
+    "checked_at": "2026-10-25",
+    "service_tier": "default",
+    "context": "Text only, <=272000 input tokens, standard global endpoint",
+    "models": {
+      "gpt-6-luna": {
+        "input": "0.10",
+        "cached_input": "0.01",
+        "cache_write": "0.125",
+        "output": "0.50",
+        "source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+      },
+      "gpt-6.1-sol": {
+        "input": "2.00",
+        "cached_input": "0.10",
+        "cache_write": "2.50",
+        "output": "10.00",
+        "source": "https://developers.openai.com/api/docs/models/gpt-6.1-sol"
+      }
+    }
+  },
+  "metric_schema": "initial-signal-v1",
+  "experiments": [
+    {
+      "seed": 7,
+      "estimated_model_cost_usd": "0.0002499000",
+      "same_checkpoint_world_verified": true,
+      "baseline_final": {
+        "posts": 19,
+        "reposts": 18,
+        "unverified_sharers": 18,
+        "verified_sharers": 0,
+        "unverified_share_rate": 0.9,
+        "population": 20,
+        "step": 5,
+        "signal_sharers": 18,
+        "external_signal_reposts": 1,
+        "external_posts": 1,
+        "external_reposts": 1,
+        "external_unverified_posts": 1
+      },
+      "candidate_final": {
+        "posts": 32,
+        "reposts": 30,
+        "unverified_sharers": 20,
+        "verified_sharers": 0,
+        "unverified_share_rate": 1.0,
+        "population": 20,
+        "step": 5,
+        "signal_sharers": 15,
+        "external_signal_reposts": 0,
+        "external_posts": 1,
+        "external_reposts": 0,
+        "external_unverified_posts": 1
+      },
+      "candidate_minus_baseline": {
+        "signal_sharers": -3,
+        "external_signal_reposts": -1,
+        "unverified_sharers": 2,
+        "external_reposts": -1,
+        "external_unverified_posts": 0
+      }
+    },
+    {
+      "seed": 8,
+      "estimated_model_cost_usd": "0.0002274000",
+      "same_checkpoint_world_verified": true,
+      "baseline_final": {
+        "posts": 20,
+        "reposts": 19,
+        "unverified_sharers": 19,
+        "verified_sharers": 0,
+        "unverified_share_rate": 0.95,
+        "population": 20,
+        "step": 5,
+        "signal_sharers": 19,
+        "external_signal_reposts": 1,
+        "external_posts": 1,
+        "external_reposts": 1,
+        "external_unverified_posts": 1
+      },
+      "candidate_final": {
+        "posts": 23,
+        "reposts": 21,
+        "unverified_sharers": 20,
+        "verified_sharers": 0,
+        "unverified_share_rate": 1.0,
+        "population": 20,
+        "step": 5,
+        "signal_sharers": 19,
+        "external_signal_reposts": 0,
+        "external_posts": 1,
+        "external_reposts": 0,
+        "external_unverified_posts": 1
+      },
+      "candidate_minus_baseline": {
+        "signal_sharers": 0,
+        "external_signal_reposts": -1,
+        "unverified_sharers": 1,
+        "external_reposts": -1,
+        "external_unverified_posts": 0
+      }
+    }
+  ],
+  "summary": {
+    "pairs": 2,
+    "mean_candidate_minus_baseline": {
+      "signal_sharers": -1.5,
+      "external_signal_reposts": -1,
+      "unverified_sharers": 1.5,
+      "external_reposts": -1,
+      "external_unverified_posts": 0
+    }
+  },
+  "limitations": "Two synthetic seeds; descriptive counts, not evidence about humans or general model superiority.",
+  "analysis": "Original-signal metrics derived from saved engine frames without repeating simulation or API calls.",
+  "artifact_sha256": {
+    "report.json": "cfcc1d98a0e6df54e653fa8d0b13fa0a85134915e0d249261701e3dc758bcf95",
+    "report.original.json": "4139444e898282b276c2224e557e1f1eeb42178fe381fa49d0d3ab037cdec0ec",
+    "decisions.jsonl": "59ceef2069a4421795ec9ab0ccf8be1794b35298396ad4caf6cd5a3d277f91b0",
+    "costs.jsonl": "9f960148d606875fe659f8d363b6b97ad3bd8c88fd4e52120522110ec9bfc603"
+  }
+}

@@ -26,6 +26,12 @@ it is not a restorable checkpoint or a complete database backup.
 
 ## Connect an AI agent
 
+For the runnable OpenAI policy, scoped observations, paired baseline and cost
+tracking, start with [AI experiments](ai-experiments.md) and
+`./scripts/experiment`. The example below targets the trusted operator/debug
+API; it deliberately sees full state. The dedicated experiment server is the
+restricted alternative.
+
 `examples/external_agent.py` shows the real transport. Replace its action
 selection with a call to your own agent framework or model:
 
@@ -45,7 +51,7 @@ your external agent fails. Record model/version, prompts and responses with
 your experiment if you need an audit trail. LLM continuation is not guaranteed
 deterministic, even when the simulated world starts from the same checkpoint.
 
-The current external observation exposes the whole world. Do not present it
+The dashboard/debug external observation exposes the whole world. Do not present it
 as an agent-scoped information test or claim a trained policy generalizes from
 this environment. Reward is intentionally unset. Other clients create other
 worlds; they do not join the same society automatically.

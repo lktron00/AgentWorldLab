@@ -53,3 +53,29 @@ No human-population calibration, paid LLM run, public server exposure,
 Windows-native support, Intel macOS support or large-scale load test is claimed.
 Checkpoints from earlier adapter revisions deliberately require their original
 code. There is no checkpoint migration in this release.
+
+
+## External AI experiments — 2026-10-25 (unreleased)
+
+- Full macOS ARM suite after scoped server, permissions, reset tickets, cost ledger
+  and SDK transport changes: **75 passed in 149.74 s**. A subsequent metric-only
+  increment distinguishes original-signal diffusion from new questions; its
+  focused contract/paired-run tests are recorded with the PR validation.
+- Real paid-provider end-to-end run used `scripts/experiment --seeds 7 8 --steps 3
+  --budget-usd 0.10`, GPT-6 Luna with low effort and the three genuine engines.
+  Both pairs restored matching full-world/clock fingerprints from a checkpoint.
+- Six completed model calls: 3,358 input tokens, 283 output tokens, no unresolved
+  usage. Estimated model cost **US$0.0004773** at the recorded standard rates
+  (seed 7: $0.0002499; seed 8: $0.0002274). This excludes infrastructure/taxes and
+  Codex/development usage; it is not a billing invoice.
+- Baseline/candidate final original-signal sharers: **18/15** for seed 7 and
+  **19/19** for seed 8. The candidate did not repost the original signal; it
+  requested evidence. Its new question can also diffuse, so aggregate unverified
+  counts are kept separate. Two toy seeds establish an executed comparison, not
+  predictive validity or general model superiority.
+- Additional original-signal metrics were derived from saved engine frames;
+  no generation or simulation was repeated. Original report preserved locally.
+- [Sanitized real-run summary](docs/ai-validation.json) records per-seed outcomes,
+  usage, rates and artifact hashes without credentials or provider response IDs.
+  Exact prompts, decisions, provider receipts and engine data stay in gitignored
+  `data/experiments/ai-first-run-20261025/`.

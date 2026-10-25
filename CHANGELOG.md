@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Server-enforced external-agent observations and visible-post action guards;
+  separate local agent/operator capabilities in a dedicated OpenEnv server.
+- Optional Responses API policy, deterministic visible-feed baseline and paired
+  checkpoint runner (`scripts/experiment`). No paid calls in the normal demo.
+- Durable per-call usage/cost journal, total budget reservation, cache/ reasoning
+  accounting and readable experiment reports. Ambiguous API failures stop further
+  spending and remain unresolved rather than being counted as free.
+- External account now follows accounts 1 and 2. This adapter change invalidates
+  v0.1.0 checkpoints; keep that release to restore earlier experiments.
+
 ## 0.1.0 — initial experimental release
 
 - Real AgentSociety 2 scheduling, OASIS social state and OpenEnv sessions in

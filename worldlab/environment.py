@@ -15,6 +15,7 @@ ACTIVE = {}
 
 class LabEnvironment(Environment[LabAction, LabObservation, LabState]):
     SUPPORTS_CONCURRENT_SESSIONS = True
+    restricted = False
 
     def __init__(self):
         super().__init__()
@@ -36,7 +37,7 @@ class LabEnvironment(Environment[LabAction, LabObservation, LabState]):
                 ACTIVE.pop(self.latest["run_id"], None)
             self.latest = result
             ACTIVE[result["run_id"]] = self
-            return LabObservation(snapshot=result, done=result["done"])
+            return self._observation(result)
 
     def step(self, action: LabAction, timeout_s=None, **kwargs):
         with self.lock:
@@ -44,8 +45,14 @@ class LabEnvironment(Environment[LabAction, LabObservation, LabState]):
                 raise RuntimeError("Reset first")
             if self.latest["status"] == "failed":
                 raise RuntimeError("The world failed; reset or restore a checkpoint before continuing")
-            self.latest = self._call("step", action=action.model_dump(exclude={"metadata"}))
-            return LabObservation(snapshot=self.latest, done=self.latest["done"])
+            self.latest = self._call("step", action=action.model_dump(exclude={"metadata"}), restricted=self.restricted)
+            return self._observation(self.latest)
+
+    def _observation(self, snapshot):
+        if self.restricted:
+            from .observations import agent_view
+            return LabObservation(snapshot=agent_view(snapshot), done=snapshot["done"])
+        return LabObservation(snapshot=snapshot, done=snapshot["done"])
 
     @property
     def state(self):
