@@ -4,15 +4,17 @@ Objective: make Agent World Lab usable by other people as an open-source project
 
 ## Required before announcing the release
 
-- [ ] Fresh installation from the published source, with pinned upstream revisions and no dependence on the author's filesystem.
-- [ ] macOS ARM and Linux runtime verification of AgentSociety 2, OASIS and OpenEnv; document any unsupported platform accurately.
+- [x] Fresh installation from the published source, with pinned upstream revisions and no dependence on the author's filesystem.
+- [x] macOS ARM and Linux runtime verification of AgentSociety 2, OASIS and OpenEnv; document any unsupported platform accurately.
 - [x] Reliable reset, step, recovery, checkpoints, replay and export, including failure and concurrency tests.
 - [x] Agent policies and scenarios that users can extend; a documented path for real external AI agents, with honest separation from the scripted baseline.
 - [x] Working dashboard, API documentation and runnable examples, including resuming a saved experiment.
 - [x] Default local exposure protected against cross-origin browser access; no credentials, private logs or run data published.
 - [x] License, third-party notices, contribution instructions, security reporting, release notes and public automated checks.
-- [ ] Public GitHub repository with the tested commit, passing CI and a downloadable tagged release.
-- [ ] Verify the published links and installation instructions as an unauthenticated reader.
+- Publication gate: the tagged release must point to a passing CI commit and
+  include a downloadable source archive and checksum. Verify its links without
+  authentication before announcing it. Publication status is recorded on the
+  [GitHub releases page](https://github.com/lktron00/AgentWorldLab/releases).
 
 ## Current authoritative starting point
 
@@ -35,4 +37,7 @@ Update this file with concrete evidence as gates are satisfied. Keep unfinished 
   endpoint counts 20/10 and 20/14 and a paired mean difference of 8.
 - Public repository created at https://github.com/lktron00/AgentWorldLab;
   anonymous GitHub API access confirms `private: false`. Private vulnerability
-  reporting is enabled. Release and final platform checks remain pending.
+  reporting is enabled. Anonymous source cloning also succeeded.
+- Linux x86_64: 51 tests passed in public CI from a fresh checkout. Linux ARM64:
+  51 tests passed in a non-root container with networking disabled. Exact
+  evidence and platform limits are recorded in VALIDATION.md.

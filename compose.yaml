@@ -2,7 +2,7 @@ services:
   lab:
     build: .
     ports:
-      - "127.0.0.1:8765:8765"
+      - "127.0.0.1:${WORLDLAB_PORT:-8765}:8765"
     volumes:
       - worldlab-data:/app/data
     shm_size: 512mb

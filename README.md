@@ -31,6 +31,7 @@ the image. Data persists in a named volume. The published port is bound to
 `127.0.0.1`; keep that binding. Stop with `docker compose down` (without `-v` to
 preserve experiments). Docker Desktop needs enough memory for Python and Ray;
 8 GB allocated to Docker is a starting recommendation, not a measured minimum.
+To select another host port: `WORLDLAB_PORT=8768 docker compose up --build`.
 
 Open **http://127.0.0.1:8765**. The first world may take 30–90 seconds to start Ray and import upstream modules. Later ticks are much faster.
 
