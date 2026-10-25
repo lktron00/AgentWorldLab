@@ -1,0 +1,29 @@
+{
+  "agentsociety2": {
+    "url": "https://github.com/tsinghua-fib-lab/AgentSociety.git",
+    "commit": "0ca73abca877b43eefb01f7d3cdf588461489861",
+    "package": "packages/agentsociety2",
+    "version": "2.9.3",
+    "license": "Apache-2.0",
+    "python": "3.12",
+    "environment": ".venv"
+  },
+  "oasis": {
+    "url": "https://github.com/camel-ai/oasis.git",
+    "commit": "8607dba82d73f7bfc371b3beafe57cc844687be2",
+    "package": ".",
+    "version": "0.2.5",
+    "license": "Apache-2.0",
+    "python": "3.11",
+    "environment": ".venv-oasis"
+  },
+  "openenv": {
+    "url": "https://github.com/openenv/OpenEnv.git",
+    "commit": "6e5c73c0231dae82878c1a94c43e155527e26105",
+    "package": ".",
+    "version": "0.10.1.dev0",
+    "license": "BSD-3-Clause",
+    "python": "3.12",
+    "environment": ".venv-api"
+  }
+}

@@ -1,0 +1,10 @@
+[project]
+name = "agent-world-lab"
+version = "0.1.0"
+description = "A local multi-agent laboratory connecting AgentSociety 2, OASIS and OpenEnv"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: executes real AgentSociety, Ray, OASIS and OpenEnv runtimes"]

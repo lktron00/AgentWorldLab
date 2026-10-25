@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Agent World Lab</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='30' fill='%23217a62'%3E◈%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header><a class="brand" href="/"><span class="mark">◈</span> Agent World Lab <small>PROTOTYPE 0.1</small></a><div class="runtime"><i></i> LOCAL · AGENTES PROGRAMADOS <a href="/docs" target="_blank">API ↗</a></div></header>
+  <main>
+    <aside>
+      <div class="eyebrow">01 / EXPERIMENTO</div><h2>Difusión de señales</h2>
+      <p class="muted">Una comunidad sintética, información compartida y reglas que puedes cambiar.</p>
+      <label for="seed">Semilla</label><input id="seed" type="number" min="0" max="4294967295" value="7">
+      <label for="population">Agentes de la comunidad</label><select id="population"><option value="20">20 agentes</option><option value="40">40 agentes</option><option value="60">60 agentes</option></select>
+      <label for="policy">Regla de difusión</label><select id="policy"><option value="open">Abierta</option><option value="friction">Fricción para señales sin verificar</option></select>
+      <p class="hint">La fricción multiplica por 0,2 la probabilidad de compartir contenido sin etiqueta de verificación.</p>
+      <button id="create" class="primary wide">Crear mundo <span>↗</span></button>
+      <div class="divider"></div><div class="eyebrow">02 / AGENTE EXTERNO</div>
+      <label for="content">Publicar como agente 0</label><textarea id="content" rows="4" maxlength="1000">SEÑAL SINTÉTICA: el registro Orion sigue operativo. Evidencia disponible.</textarea>
+      <label class="checkbox"><input id="verified" type="checkbox" checked> Etiqueta de verificación</label>
+      <p class="hint">Etiqueta del escenario; no comprueba la veracidad del texto.</p>
+      <button id="publish" class="wide" disabled>Publicar y avanzar →</button>
+      <div class="divider"></div><div class="eyebrow">MOTORES CONECTADOS</div>
+      <div class="engine"><b>AgentSociety 2</b><span>Agentes · reloj · persistencia</span></div>
+      <div class="engine"><b>OASIS</b><span>Red social · publicaciones</span></div>
+      <div class="engine"><b>OpenEnv</b><span>Sesión · acciones · observaciones</span></div>
+    </aside>
+    <section class="workspace">
+      <div class="heading"><div><div class="eyebrow">UN LABORATORIO ABIERTO PARA SISTEMAS MULTIAGENTE</div><h1>Un mundo. Dos futuros.</h1><p class="muted">Observa, guarda un punto de partida y compara qué cambia al cambiar una regla.</p></div><span class="badge" id="status">SIN INICIAR</span></div>
+      <div class="toolbar"><div class="transport"><button id="step" disabled>＋ 1 paso</button><button id="run" class="primary" disabled>▶ Ejecutar 5 pasos</button><button id="pause" hidden>Ⅱ Pausar</button></div><div class="clock"><span id="clock">00:00</span><small id="step-label">PASO 00 / 30</small></div></div>
+      <div class="metrics"><article><span>Agentes que compartieron sin verificar</span><strong id="unverified-count">—</strong><small id="unverified-rate">Esperando el primer mundo</small></article><article><span>Agentes que compartieron con etiqueta</span><strong id="verified-count">—</strong><small>Según las etiquetas del escenario</small></article><article><span>Publicaciones / republicaciones</span><strong id="posts-count">—</strong><small id="run-label">Sin ejecución activa</small></article></div>
+      <div class="world-grid"><article class="panel network-panel"><div class="panel-header"><h3>El mundo en este instante</h3><span id="policy-label">RED SOCIAL</span></div><svg id="network" viewBox="0 0 680 410" role="img" aria-label="Red de seguimiento entre agentes"><text x="340" y="195" text-anchor="middle" fill="#8a9691" font-size="16">Crea un mundo para explorar la red</text><text x="340" y="225" text-anchor="middle" fill="#a0aaa5" font-size="12">20 agentes + tu agente externo</text></svg><div class="legend"><span><i class="neutral"></i>Sin publicaciones</span><span><i class="amber"></i>Sin verificar</span><span><i class="teal"></i>Con etiqueta</span><span>◎ Agente externo</span></div></article><article class="panel feed-panel"><div class="panel-header"><h3>Actividad reciente</h3><span id="feed-count">0 POSTS</span></div><div id="feed"><div class="empty">Aquí aparecerán las acciones reales registradas por OASIS.</div></div></article></div>
+      <article class="panel experiment"><div class="panel-header"><h3>Repetir desde el mismo punto</h3><span>CHECKPOINT & COMPARACIÓN</span></div><div class="experiment-body"><p id="checkpoint-label">Guarda el mundo completo: estado de agentes, reloj y base de datos social.</p><div class="actions"><button id="save" disabled>◇ Guardar checkpoint</button><button id="restore" disabled>↶ Restaurar</button><button id="compare" disabled>Comparar abierta / fricción ↗</button><a id="export" class="button disabled" href="#">Exportar datos ↓</a></div><div id="comparison" hidden><div class="comparison-head"><p>Misma semilla y mismo checkpoint. <b>5 pasos por rama.</b></p><span><i class="amber"></i> Abierta <i class="teal"></i> Fricción</span></div><svg id="chart" viewBox="0 0 900 180" aria-label="Comparación de agentes que compartieron sin verificar"></svg><p id="comparison-result"></p></div></div></article>
+      <div class="replay"><label for="timeline">REPLAY <span id="replay-label">Estado actual</span></label><input id="timeline" type="range" min="0" max="0" value="0" disabled><button id="live" disabled>Volver al presente</button></div>
+      <div id="notice" role="status">Listo para crear un experimento. La primera carga inicia los tres entornos y puede tardar un minuto.</div>
+      <footer>Modelo de prueba con reglas explícitas. Los resultados muestran el comportamiento del escenario; no son predicciones de una población real.</footer>
+    </section>
+  </main>
+  <script src="/assets/app.js"></script>
+</body>
+</html>
