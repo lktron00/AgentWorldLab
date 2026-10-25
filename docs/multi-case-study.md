@@ -33,7 +33,7 @@ Each account chooses one action per turn: wait, post, repost an eligible visible
 
 No sharing-rate multiplier, target number of reposts or preferred answer is supplied. Models declare the probability that the case's question is true, assess observed evidence as insufficient/supporting/contradictory/mixed, and may cite visible post/document IDs. Invalid references are recorded as a data-quality flag. A brief public justification is stored; internal reasoning is not exposed.
 
-A completed but invalid model action retains its original usage receipt. Up to two additional model samples of the identical observation may be attempted. There is no scripted action fallback. Three invalid samples stop that pair and move to the next case; the cost remains allocated to that case. Transport failures with missing usage retain their maximum reservation and stop new spending for reconciliation.
+A completed but invalid model action retains its original usage receipt. Up to two additional model samples of the identical observation may be attempted. There is no scripted action fallback. Three invalid samples stop that pair and move to the next case; the cost remains allocated to that case. A worker stops after a transport failure with missing usage. The supervisor audits the saved data, quarantines the entire maximum reservation and continues at the next scheduled case. It never repeats an unknown request or calls it free.
 
 AgentSociety 2 schedules and persists all active accounts, OASIS owns social state, and an operator-only OpenEnv endpoint commits validated account-ID-ordered actions. All decisions use a frozen pre-tick world. A missing, duplicate, stale or invisible-post batch changes no state. Account 0 remains a dormant technical account.
 
@@ -51,13 +51,13 @@ The new generation ledger has one shared remaining budget. Exact input counts an
 
 The ledger includes every paid attempt, cache writes and reported output. Reasoning is already included in output and is never charged twice. Amounts are usage-based cost calculations, not final billing invoices. Tax, local infrastructure and Codex development credits are excluded. The gate may leave a small unused balance when another bounded request cannot fit; it does not waste tokens to hit a round dollar amount.
 
-At shutdown the offline auditor independently reconciles original provider requests/responses and all paid attempts, includes the verified prior debit, replays the simultaneous-reservation budget gate, reconstructs all applied observations and private checks, verifies every engine action and frame hash, compares OASIS databases, and checks the derived decision index. It permits explicitly marked uncommitted proposals from the final partial tick, never counts them as applied actions, and records the auditor's source hash.
+At shutdown the offline auditor independently reconciles every saved provider request/response and known paid attempt, includes the verified prior debit, replays the simultaneous-reservation budget gate, reconstructs all applied observations and private checks, verifies every engine action and frame hash, compares OASIS databases, and checks the derived decision index. It permits explicitly marked uncommitted proposals, never counts them as applied actions, and records the auditor's source hash. Unknown requests retain their original maximum in every replayed budget check. `usage_complete=false` identifies a cost interval rather than an exact usage total; `budget_bounds_verified=true` verifies the ceiling, including all unknown maxima.
 
 ```sh
-.venv-api/bin/python -m worldlab.study_audit data/studies/nine-cases-10usd
+.venv-api/bin/python -m worldlab.study_audit data/studies/nine-cases-10usd --allow-quarantined
 ```
 
-Full local data stays under the ignored study directory. Source snapshots and upstream/dependency pins are retained with the execution. Do not delete, restart or bypass a cost ledger to reclaim reservations. Keep the native server on loopback until production authentication and tenant isolation exist.
+Full local data stays under the ignored study directory. Source snapshots and upstream/dependency pins are retained with the execution. Never delete or reset a cost ledger to reclaim reservations. Keep the native server on loopback until production authentication and tenant isolation exist.
 
 
 ## Recovering a stopped run
@@ -66,7 +66,7 @@ Full local data stays under the ignored study directory. Source snapshots and up
 
 The interrupted pair and its paid, unapplied proposals remain in the dataset and stay excluded from paired aggregates. Resumption metadata retains the prior report, audit, server log, ledger hash and a fresh source snapshot under `resumptions/`. The original source snapshot remains intact. While running again, the prior audit is archived so it cannot be mistaken for the final full audit.
 
-The [input-count endpoint](https://developers.openai.com/api/docs/guides/token-counting) counts the request before sending it to the model. After an input-count endpoint timeout, the same count-only request can retry twice before any generation reservation. Model generation still has SDK retries disabled. A generation without a usage receipt blocks resumption; its reservation must be reconciled rather than assumed free.
+The [input-count endpoint](https://developers.openai.com/api/docs/guides/token-counting) counts the request before sending it to the model. After an input-count endpoint timeout, the same count-only request can retry twice before any generation reservation. Model generation still has SDK retries disabled. A generation without a usage receipt blocks ordinary resumption. The explicit `--quarantine-unknown` recovery option preserves its full maximum and excludes it from active-request capacity, while retaining it in the shared budget. No usage or zero-cost receipt is fabricated. A later genuine provider receipt can replace the bound.
 
 
 ## Recorded validation
@@ -76,3 +76,18 @@ The full source suite passed **127 tests** in 359.70 seconds after the recovery 
 An offline audit verified the first nine pairs (3,600 model decisions, 18 OASIS worlds and 198 engine frames). After a later input-count timeout, another audit verified 9,379 provider responses and US$2.9288145750 cumulative usage. It identified 19 paid proposals from an uncommitted tick. Those proposals remain inspectable and labeled, and resumption preserves the original budget ledger. The native viewer was checked on that tick: 19 registered proposals, zero applied actions.
 
 These are historical progress checks, not the finished study. The active process continues under the US$10 cumulative cap and writes its final `audit.json` after stopping with fully reconciled usage. Read the current local report for the latest status and totals.
+
+
+## Finite job independent of the chat
+
+```sh
+./scripts/study-job --detach --output data/studies/nine-cases-10usd --max-pairs 200
+```
+
+The supervisor starts in its own OS session with redirected streams and no terminal dependency. It owns `.job.lock`, writes `job.json` heartbeats every five seconds and launches a worker that owns `.writer.lock`. One original ledger is shared by every recovery. At most 12 transient restarts are permitted by default; authentication errors, failed preflight audits and explicit interruptions require attention. An interrupted pair remains incomplete and the next scheduled seed is used. This is a finite job, not a new recurring paid experiment.
+
+`costs.jsonl` adds a `quarantined` event referencing the unchanged reservation. Confirmed spend plus quarantined maxima plus all currently active reservations must fit within the original budget. The auditor independently recomputes the request maximum from the recorded rates and token limits and rejects a lost context that was regenerated. Quarantine is a conservative liability, never a confirmed charge.
+
+The native catalog checks writer liveness instead of trusting a stale running flag. It shows recovery or required reconciliation when a writer disappears. Complete JSONL/SQLite exports wait until the job stops; the scoped decision viewer stays available throughout. At successful closure, `audit.json`, `completion.json` and `results.md` record the final outcomes, confirmed cost and maximum possible cost. The page labels confirmed cost explicitly.
+
+For this local execution a finite macOS idle-sleep assertion follows the supervisor PID; it expires with that process and does not change permanent settings. A thread heartbeat named “Completar simulación AgentWorldLab” checks progress quietly, verifies final artifacts, reports completion or a concrete blocker and then pauses itself.

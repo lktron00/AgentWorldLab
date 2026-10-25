@@ -1,11 +1,12 @@
 """Read-only multi-case study browser. Decision queries use a derived SQLite index."""
 import base64
 import hashlib
+import fcntl
 import json
 import re
 import sqlite3
 from fastapi import APIRouter,HTTPException,Query
-from fastapi.responses import HTMLResponse,FileResponse,JSONResponse
+from fastapi.responses import HTMLResponse,FileResponse,JSONResponse,Response
 from .common import DATA,ROOT
 from .reports import read_artifact
 
@@ -19,10 +20,25 @@ def directory(name):
     return path
 
 
+def held_lock(path):
+    if path.is_symlink() or not path.is_file():return False
+    with path.open('r') as stream:
+        try:fcntl.flock(stream,fcntl.LOCK_SH|fcntl.LOCK_NB)
+        except BlockingIOError:return True
+        return False
+
+
 def report_for(name):
     try:
         report=read_artifact(directory(name)/'report.json')
         if report['kind']!='balanced-ai-case-study':raise ValueError('Invalid study')
+        folder=directory(name)
+        if (folder/'job.json').is_file() and not (folder/'job.json').is_symlink():
+            report['job']=read_artifact(folder/'job.json')
+        if report['status']=='running' and report.get('resumptions') and not held_lock(folder/'.writer.lock'):
+            active=held_lock(folder/'.job.lock')
+            report['status']='recovering' if active else 'needs_reconciliation'
+            if not active:report['error']={'type':'WriterNotRunning','message':'El proceso no está activo. El último corte se conserva; requiere recuperación.'}
         return report
     except (ValueError,OSError,KeyError) as exc:raise HTTPException(409,'Invalid study artifact') from exc
 
@@ -67,8 +83,12 @@ def decisions(name:str,case_id:str=Query(pattern='^[a-z0-9-]{1,60}$'),seed:int=Q
 
 @router.get('/lab/studies/{name}/files/{filename}')
 def download(name:str,filename:str):
-    if filename not in {'report.json','costs.jsonl','decisions.jsonl','audit.json','decisions.sqlite'}:raise HTTPException(404,'Unknown artifact')
+    if filename not in {'report.json','costs.jsonl','decisions.jsonl','audit.json','decisions.sqlite','completion.json','results.md'}:raise HTTPException(404,'Unknown artifact')
     path=directory(name)/filename
     if path.is_symlink() or not path.is_file():raise HTTPException(404,'Artifact unavailable')
-    if filename=='decisions.sqlite' and report_for(name)['status']=='running':raise HTTPException(409,'SQLite download is available after execution; use the live decision viewer meanwhile')
+    if filename in {'decisions.sqlite','costs.jsonl','decisions.jsonl','audit.json','completion.json','results.md'}:
+        if report_for(name)['status'] in {'running','recovering'} or held_lock(directory(name)/'.job.lock'):
+            raise HTTPException(409,'Complete exports are available after the job stops; use the live decision viewer meanwhile')
+    if filename=='report.json':
+        return Response(path.read_bytes(),media_type='application/json',headers={'Content-Disposition':f'attachment; filename=worldlab-{name}-report.json','Cache-Control':'no-store'})
     return FileResponse(path,filename='worldlab-'+name+'-'+filename,headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})

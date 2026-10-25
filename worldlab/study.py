@@ -41,7 +41,8 @@ class Saver:
     def __init__(self,output,study,ledger,*,resume=False):
         self.output,self.study,self.ledger=output,study,ledger
         if resume and not (output/'decisions.sqlite').is_file():raise ValueError('Missing existing decision index')
-        self.offset=(output/'decisions.jsonl').stat().st_size if resume else 0
+        self.offset=0
+        self.replaying=resume
         self.db=sqlite3.connect(output/'decisions.sqlite')
         self.db.execute('PRAGMA journal_mode=WAL')
         if not resume:self.db.execute('CREATE TABLE decisions (id TEXT PRIMARY KEY,seed INTEGER,branch TEXT,step INTEGER,actor INTEGER,case_id TEXT,body TEXT,applied INTEGER NOT NULL DEFAULT 0)')
@@ -59,17 +60,24 @@ class Saver:
                     self.offset=before;break
                 event=json.loads(line)
                 if event['event']=='decision':
-                    self.db.execute('INSERT INTO decisions(id,seed,branch,step,actor,case_id,body) VALUES (?,?,?,?,?,?,?)',
-                      (event['decision_id'],event['seed'],event['branch'],event['step'],event['actor'],event['case_id'],line))
+                    existing=self.db.execute('SELECT body FROM decisions WHERE id=?',(event['decision_id'],)).fetchone() if self.replaying else None
+                    if existing:
+                        if json.loads(existing[0])!=event:raise ValueError('Indexed decision differs from its journal')
+                    else:
+                        self.db.execute('INSERT INTO decisions(id,seed,branch,step,actor,case_id,body) VALUES (?,?,?,?,?,?,?)',
+                          (event['decision_id'],event['seed'],event['branch'],event['step'],event['actor'],event['case_id'],line))
                 elif event['event']=='applied_batch':
                     self.db.executemany('UPDATE decisions SET applied=1 WHERE id=?',[(i,) for i in event['decision_ids']])
                 self.offset=stream.tell()
         self.db.commit()
+        self.replaying=False
 
     def __call__(self,output=None,report=None,ledger=None):
         self.index()
         study=self.study;ledger=self.ledger
         # Derive exact allocations from the shared receipts, including invalid paid attempts.
+        counts=dict(self.db.execute('SELECT seed,count(*) FROM decisions GROUP BY seed'))
+        for run in study['runs']:run['decisions']=counts.get(run['config']['start_seed'],0)
         allocations={}
         for receipt in ledger.receipts:
             context=ledger.contexts[receipt['call_id']]
@@ -99,7 +107,7 @@ class Saver:
         current=ledger.summary();previous=amount(study['previous_pilot']['cost_usd'])
         study.update(updated_at=now(),summary=summary,cost={'additional':current,
           'previous_pilot_usd':usd(previous),'total_confirmed_usd':usd(previous+ledger.spent),
-          'total_maximum_exposure_usd':usd(previous+ledger.spent+sum(ledger.pending.values(),Decimal(0))),
+          'total_maximum_exposure_usd':usd(previous+ledger.spent+sum(ledger.pending.values(),Decimal(0))+sum(ledger.held.values(),Decimal(0))),
           'cumulative_budget_usd':study['cumulative_budget_usd']},
           progress={'completed_pairs':sum(s['pairs'] for s in summary),'decisions':sum(r['decisions'] for r in study['runs']),
                     'applied_decisions':self.db.execute('SELECT count(*) FROM decisions WHERE applied=1').fetchone()[0],

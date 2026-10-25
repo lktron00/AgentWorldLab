@@ -19,11 +19,14 @@ def lines(path):
             yield json.loads(line)
 
 
-def audit_study(output):
+def audit_study(output,*,allow_quarantined=False):
     output=Path(output);report=read_json(output/'report.json')
     accounting=audit_ledger(output/'costs.jsonl',maximum=1024*1024*1024)
-    if accounting['warnings'] or accounting['journal_truncated'] or accounting['summary']['unresolved_calls']:
-        raise AuditError('Usage must be reconciled before this dataset can be verified')
+    unknown=[c for c in accounting['calls'] if c['receipt'] is None]
+    if accounting['warnings'] or accounting['journal_truncated']:
+        raise AuditError('Malformed or unverifiable usage cannot be audited')
+    if unknown and (not allow_quarantined or any(not c['quarantined'] for c in unknown)):
+        raise AuditError('Unknown usage must retain an explicitly quarantined full reservation')
     previous=amount(report['previous_pilot']['cost_usd']);cap=amount(report['cumulative_budget_usd'])
     previous_path=Path(report['previous_pilot']['path'])/'costs.jsonl'
     if hashlib.sha256(previous_path.read_bytes()).hexdigest()!=report['previous_pilot']['costs_sha256']:
@@ -36,7 +39,10 @@ def audit_study(output):
     reservations={};proposals={};pending={};spent=Decimal(0);peak=previous
     for e in lines(output/'costs.jsonl'):
         if e['event']=='reserved':
-            pending[e['call_id']]=amount(e['reserved_usd'])
+            rates=accounting['price_book']['models']['gpt-6-luna']
+            maximum=(e['input_tokens_counted']*max(amount(rates['input']),amount(rates['cache_write']))+e['max_output_tokens']*amount(rates['output']))/1_000_000
+            if e['max_output_tokens']!=2048 or maximum!=amount(e['reserved_usd']):raise AuditError('Generation bound differs from recorded rates and token limits')
+            pending[e['call_id']]=maximum
             request=e['request'];observation=json.loads(request['input'][0]['content'])
             if request['instructions']!=report['instructions'] or request['model']!='gpt-6-luna':raise AuditError('Unexpected instructions or model')
             if observation['view']!='study-agent-v1' or {'world','truth','metrics','case_id','branch','scenario'} & observation.keys():raise AuditError('Privileged model input')
@@ -75,6 +81,12 @@ def audit_study(output):
         if proposal!=proposals[e['call_id']]:raise AuditError('Applied proposal differs from the model response')
         if any(e[k]!=receipt[k] for k in ('response_id','model','usage','estimated_cost_usd')):raise AuditError('Decision cost receipt mismatch')
         decisions[key]=e;decision_ids.add(e['decision_id'])
+    for call in unknown:
+        c=reservations[call['call_id']]
+        if (c['seed'],c['branch'],c['step'],c['actor']) in decisions:
+            raise AuditError('An unreceipted generation context was regenerated')
+    if amount(report['cost']['total_maximum_exposure_usd'])!=previous+spent+sum(pending.values(),Decimal(0)):
+        raise AuditError('Reported maximum exposure differs from retained reservations')
     used={d['call_id'] for d in decisions.values()}
     if used&invalid or used|invalid!=set(receipts):raise AuditError('Each paid receipt needs a valid decision or a recorded invalid proposal')
     applied=0;frames_verified=0;databases=0;complete_pairs=0
@@ -115,7 +127,9 @@ def audit_study(output):
                     databases+=1
         if db.execute('SELECT count(*) FROM decisions WHERE applied=1').fetchone()[0]!=applied:raise AuditError('Applied index count differs from engine events')
     if applied!=report['progress']['applied_decisions'] or complete_pairs!=report['progress']['completed_pairs']:raise AuditError('Report progress mismatch')
-    return {'verified':True,'basis':'Offline reconstruction; no model calls','model':'gpt-6-luna',
+    return {'verified':True,'usage_complete':not unknown,'budget_bounds_verified':True,
+      'unreceipted_requests':len(unknown),'maximum_exposure_usd':usd(previous+spent+sum(pending.values(),Decimal(0))),
+      'basis':'Offline reconstruction; no model calls; unknown usage retains its full bound','model':'gpt-6-luna',
       'scope':{'complete_pairs':complete_pairs,'valid_decisions':len(decisions),'applied_decisions':applied,
                'unapplied_proposals':len(decisions)-applied,'invalid_paid_proposals':len(invalid),
                'distinct_provider_responses':len(receipts),'engine_frames':frames_verified,'oasis_databases':databases},
@@ -125,4 +139,4 @@ def audit_study(output):
 
 if __name__=='__main__':
     import sys
-    path=Path(sys.argv[1]).resolve();result=audit_study(path);write_json(path/'audit.json',result);print(json.dumps(result,indent=2))
+    path=Path(sys.argv[1]).resolve();result=audit_study(path,allow_quarantined='--allow-quarantined' in sys.argv[2:]);write_json(path/'audit.json',result);print(json.dumps(result,indent=2))

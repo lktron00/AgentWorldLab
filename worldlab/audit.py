@@ -116,6 +116,12 @@ def audit_ledger(path: Path, *, maximum=128 * 1024 * 1024):
                         or amount(event["estimated_cost_usd"]) != amount(receipt["estimated_cost_usd"])):
                     raise AuditError("Charged event contradicts the saved provider usage")
                 call["charged"] = True
+            elif kind == "quarantined":
+                if call.get('quarantined') or call['receipt'] is not None:
+                    raise AuditError('Duplicate or already receipted quarantine')
+                if amount(event['reserved_usd']) != amount(call['reservation']['reserved_usd']):
+                    raise AuditError('Quarantine changed the reservation')
+                call['quarantined'] = True
             elif kind == "unresolved":
                 # A timeout can happen after a durable response; prefer its usage
                 # if present, otherwise retain the reservation as unknown.
@@ -135,10 +141,13 @@ def audit_ledger(path: Path, *, maximum=128 * 1024 * 1024):
                "input_tokens": sum(token_count(r["usage"]["input_tokens"]) for r in receipts),
                "output_tokens": sum(token_count(r["usage"]["output_tokens"]) for r in receipts),
                "reasoning_tokens": sum(token_count((r["usage"].get("output_tokens_details") or {}).get("reasoning_tokens", 0)) for r in receipts)}
+    held = [c for c in calls.values() if c.get('quarantined') and c['receipt'] is None]
+    if held:
+        summary.update(quarantined_calls=len(held), quarantined_reserved_usd=usd(sum((amount(c['reservation']['reserved_usd']) for c in held), Decimal(0))))
     return {"summary": summary, "price_book": price_book, "receipts": receipts,
             "calls": [{"call_id": key, "seed": call["reservation"].get("seed"),
                        "branch": call["reservation"].get("branch"), "receipt": call["receipt"],
-                       "reserved_usd": call["reservation"]["reserved_usd"]} for key, call in calls.items()],
+                       "reserved_usd": call["reservation"]["reserved_usd"], "quarantined": bool(call.get("quarantined")), "charged": call["charged"]} for key, call in calls.items()],
             "recovered_receipts": sum(c["receipt"] is not None and not c["charged"] for c in calls.values()),
             "journal_truncated": truncated, "warnings": warnings,
             "budget_exceeded": spent > budget}

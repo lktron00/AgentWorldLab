@@ -24,11 +24,16 @@ def test_case_pack_covers_true_false_and_misleading_evidence():
 
 
 @pytest.mark.integration
-def test_two_cases_reuse_shared_budget_real_engines_and_index(tmp_path):
+@pytest.mark.parametrize('with_hold',[False,True])
+def test_two_cases_reuse_shared_budget_real_engines_and_index(tmp_path,with_hold):
     counter=0
     async def create(**request):
         nonlocal counter
         counter+=1
+        if with_hold and counter==17:
+            import httpx
+            from openai import APIConnectionError
+            raise APIConnectionError(request=httpx.Request('POST','https://api.openai.com/v1/responses'))
         o=json.loads(request['input'][0]['content'])
         kind='inspect_record' if o['step']==0 else 'wait'
         d={'kind':kind,'content':'','post_id':None,'reason':'Offline protocol fixture, not a real inference',
@@ -45,7 +50,7 @@ def test_two_cases_reuse_shared_budget_real_engines_and_index(tmp_path):
     prior.received(call,'gpt-6-luna',{'id':'resp_prior_offline_fixture','model':'gpt-6-luna','service_tier':'default','usage':{'input_tokens':1000,'output_tokens':100}},1)
     import hashlib
     from worldlab.study_policy import INSTRUCTIONS
-    study={'instructions':INSTRUCTIONS,'kind':'balanced-ai-case-study','status':'running','cases':CASES[:2],'runs':[],
+    study={'instructions':INSTRUCTIONS,'kind':'balanced-ai-case-study','status':'running','cases':CASES[:3] if with_hold else CASES[:2],'runs':[],
            'previous_pilot':{'path':str(previous),'cost_usd':'0.0001500000','costs_sha256':hashlib.sha256((previous/'costs.jsonl').read_bytes()).hexdigest()},'cumulative_budget_usd':'10'}
     saver=Saver(tmp_path,study,ledger)
     async def exercise(url,token):
@@ -54,14 +59,25 @@ def test_two_cases_reuse_shared_budget_real_engines_and_index(tmp_path):
             r={'status':'running','case_id':case['id'],'case_definition':case,'requested_pairs':1,
                'config':{'population':4,'steps':2,'start_seed':777+index},'experiments':[],'decisions':0}
             study['runs'].append(r)
-            await run_pair(r,tmp_path,StudyPolicy(provider,ledger,case,tmp_path),ledger,url,token,
-                concurrency=4,case=case,save_fn=saver,frame_fn=lambda s,d=():study_frame(case,s,d))
+            try:
+                await run_pair(r,tmp_path,StudyPolicy(provider,ledger,case,tmp_path),ledger,url,token,
+                    concurrency=4,case=case,save_fn=saver,frame_fn=lambda s,d=():study_frame(case,s,d))
+            except Exception:
+                if not with_hold or index!=1:raise
+                r['status']='stopped'
+                for pair in r['experiments']:
+                    pair['status']='incomplete'
+                    for branch in pair['branches'].values():branch['status']='incomplete'
+                for cid in list(ledger.pending):ledger.quarantine(cid,'Offline transport-failure fixture; maximum retained')
             saver()
-            if index==0:
+            if index==0 or (with_hold and index==1):
+                if index==0:
+                    saver.db.execute('DELETE FROM decisions WHERE id=(SELECT id FROM decisions ORDER BY rowid DESC LIMIT 1)')
+                    saver.db.commit()
                 before=ledger.spent
                 saver.close()
                 from worldlab.study_resume import reopen_ledger
-                ledger=reopen_ledger(tmp_path/'costs.jsonl')
+                ledger=reopen_ledger(tmp_path/'costs.jsonl',allow_quarantined=with_hold)
                 assert ledger.spent==before
                 saver=Saver(tmp_path,study,ledger,resume=True)
     try:
@@ -74,9 +90,18 @@ def test_two_cases_reuse_shared_budget_real_engines_and_index(tmp_path):
         assert all(json.loads(row[0])['observation']['checks'][0]['result']['id'].startswith('private-record-') for row in rows)
     finally:saver.close()
     from worldlab.study_audit import audit_study
-    audit=audit_study(tmp_path)
+    audit=audit_study(tmp_path,allow_quarantined=with_hold)
+    assert audit['usage_complete'] is (not with_hold)
+    assert audit['unreceipted_requests']==int(with_hold)
     assert audit['verified'] and audit['scope']['applied_decisions']==32
     assert audit['total_confirmed_usd']=='0.0049500000'
+    from worldlab.common import write_json
+    from worldlab.study_job import completion
+    study.update(status='completed',audit_verified=True,model='gpt-6-luna',finished_at='offline-fixture')
+    write_json(tmp_path/'audit.json',audit)
+    done=completion(tmp_path,study)
+    assert done['status']=='completed' and done['unreceipted_requests']==int(with_hold)
+    assert (tmp_path/'results.md').is_file()
 
 
 def test_actual_study_routes_and_sqlite_filters(tmp_path,monkeypatch):
@@ -144,3 +169,50 @@ def test_input_count_timeout_never_duplicates_generation(tmp_path,monkeypatch,fa
         action,receipt=asyncio.run(policy.decide(observation))
         assert action.kind=='wait' and count.await_count==2 and create.await_count==1
         assert ledger.summary()['completed_calls']==1 and not ledger.pending
+
+
+def test_quarantine_preserves_the_full_bound_across_restart(tmp_path):
+    from worldlab.audit import audit_ledger,AuditError
+    from worldlab.costs import BudgetExceeded
+    from worldlab.study_resume import reopen_ledger
+    path=tmp_path/'costs.jsonl';ledger=CostLedger(path,'0.0023',max_in_flight=1)
+    lost=ledger.reserve('gpt-6-luna',1000,2048,{'seed':1,'branch':'generic'})
+    ledger.uncertain(lost,'APIConnectionError');maximum=ledger.pending[lost]
+    ledger.quarantine(lost,'Offline failure fixture; never retry')
+    assert ledger.spent==0 and ledger.held[lost]==maximum and not ledger.pending
+    with pytest.raises(ValueError):reopen_ledger(path)
+    ledger=reopen_ledger(path,allow_quarantined=True)
+    active=ledger.reserve('gpt-6-luna',1000,2048,{'seed':2,'branch':'generic'})
+    ledger.received(active,'gpt-6-luna',{'id':'resp_bound_fixture','model':'gpt-6-luna','service_tier':'default',
+        'usage':{'input_tokens':1000,'output_tokens':100}},1)
+    with pytest.raises(BudgetExceeded):ledger.reserve('gpt-6-luna',10000,2048,{})
+    assert ledger.summary()==audit_ledger(path)['summary']
+    assert ledger.summary()['quarantined_calls']==1 and ledger.summary()['completed_calls']==1
+    assert ledger.summary()['unresolved_reserved_usd']==format(maximum,'.10f')
+    events=[json.loads(line) for line in path.read_text().splitlines()]
+    next(e for e in events if e['event']=='quarantined')['reserved_usd']='0'
+    path.write_text(''.join(json.dumps(e)+'\n' for e in events))
+    with pytest.raises(AuditError,match='changed'):audit_ledger(path)
+
+
+def test_supervisor_respects_a_stopped_run(tmp_path,monkeypatch):
+    from worldlab.study_job import run
+    (tmp_path/'report.json').write_text(json.dumps({'status':'interrupted'}))
+    popen=AsyncMock()
+    monkeypatch.setattr('worldlab.study_job.subprocess.Popen',popen)
+    assert run(tmp_path,200,3)==1
+    popen.assert_not_called()
+    assert json.loads((tmp_path/'job.json').read_text())['status']=='needs_attention'
+
+
+def test_catalog_does_not_report_a_missing_writer_as_running(tmp_path,monkeypatch):
+    import fcntl
+    from worldlab import study_catalog
+    monkeypatch.setattr(study_catalog,'DATA',tmp_path)
+    folder=tmp_path/'studies'/'orphan';folder.mkdir(parents=True)
+    (folder/'report.json').write_text(json.dumps({'kind':'balanced-ai-case-study','status':'running','resumptions':[{}]}))
+    assert study_catalog.report_for('orphan')['status']=='needs_reconciliation'
+    with (folder/'.writer.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        assert study_catalog.report_for('orphan')['status']=='running'
+    assert study_catalog.report_for('orphan')['status']=='needs_reconciliation'

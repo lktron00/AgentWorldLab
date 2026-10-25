@@ -1,0 +1,119 @@
+{
+  "kind": "supervised-study-progress-validation",
+  "final": false,
+  "snapshot_at": "2026-10-25T14:26:47.255870+00:00",
+  "progress": {
+    "completed_pairs": 35,
+    "decisions": 14500,
+    "applied_decisions": 14480,
+    "model_calls": 14500,
+    "cases_with_completed_pairs": 9
+  },
+  "cost": {
+    "additional": {
+      "currency": "USD",
+      "estimated_cost_usd": "3.1987978250",
+      "budget_usd": "9.1263119750",
+      "completed_calls": 14500,
+      "unresolved_calls": 17,
+      "unresolved_reserved_usd": "0.0197201250",
+      "accounting": "incomplete_usage",
+      "input_tokens": 20836432,
+      "output_tokens": 1455225,
+      "reasoning_tokens": 3315,
+      "quarantined_calls": 17,
+      "quarantined_reserved_usd": "0.0197201250"
+    },
+    "previous_pilot_usd": "0.8736880250",
+    "total_confirmed_usd": "4.0724858500",
+    "total_maximum_exposure_usd": "4.0922059750",
+    "cumulative_budget_usd": "10.0000000000"
+  },
+  "supervisor": {
+    "pid": 40315,
+    "parent_pid": 1,
+    "session_id": 40315,
+    "started_at": "2026-10-25T14:16:30.579556+00:00",
+    "status": "running",
+    "restarts": 0,
+    "worker_pid": 40339,
+    "source_sha256": "e05c57ea66ac15f00023d42e16334b04d86ed6da7741fed7d81de7a751ff0ba5",
+    "heartbeat_at": "2026-10-25T14:26:46.325959+00:00"
+  },
+  "tests": {
+    "command": "./scripts/test -q",
+    "passed": 131,
+    "elapsed_seconds": 436.97,
+    "paid_model_calls": 0
+  },
+  "real_engine_checks": {
+    "passed": 25,
+    "elapsed_seconds": 235.95
+  },
+  "recovery_audit": {
+    "verified": true,
+    "usage_complete": false,
+    "budget_bounds_verified": true,
+    "unreceipted_requests": 17,
+    "maximum_exposure_usd": "3.7093100500",
+    "basis": "Offline reconstruction; no model calls; unknown usage retains its full bound",
+    "model": "gpt-6-luna",
+    "scope": {
+      "complete_pairs": 31,
+      "valid_decisions": 12820,
+      "applied_decisions": 12800,
+      "unapplied_proposals": 20,
+      "invalid_paid_proposals": 0,
+      "distinct_provider_responses": 12820,
+      "engine_frames": 705,
+      "oasis_databases": 65
+    },
+    "cost": {
+      "currency": "USD",
+      "estimated_cost_usd": "2.8159019000",
+      "budget_usd": "9.1263119750",
+      "completed_calls": 12820,
+      "unresolved_calls": 17,
+      "unresolved_reserved_usd": "0.0197201250",
+      "accounting": "incomplete_usage",
+      "input_tokens": 18341196,
+      "output_tokens": 1282732,
+      "reasoning_tokens": 2869,
+      "quarantined_calls": 17,
+      "quarantined_reserved_usd": "0.0197201250"
+    },
+    "previous_pilot_usd": "0.8736880250",
+    "total_confirmed_usd": "3.6895899250",
+    "peak_confirmed_plus_reserved_usd": "3.7093100500",
+    "auditor_sha256": "6e491a909704103669c5f8609d20fdf2777583ccb591c9c648058570fe8422fe"
+  },
+  "original_journal_prefix_preserved": {
+    "size_bytes": 148787008,
+    "sha256": "554b49a489eb96b4ad1e58dc62e8fc32416655d11d957339254024bac8e8a8ae"
+  },
+  "runtime_sources_match_latest_phase": true,
+  "detachment_probe": {
+    "pid": 38710,
+    "parent_pid": 1,
+    "session_id": 38710,
+    "started_at": "2026-10-25T14:11:41.171501+00:00",
+    "status": "probe_completed",
+    "restarts": 0,
+    "worker_pid": null,
+    "source_sha256": "e05c57ea66ac15f00023d42e16334b04d86ed6da7741fed7d81de7a751ff0ba5",
+    "heartbeat_at": "2026-10-25T14:12:21.180663+00:00",
+    "finished_at": "2026-10-25T14:12:21.180653+00:00"
+  },
+  "automation_id": "completar-simulaci-n-agentworldlab",
+  "ui_checks": {
+    "supervisor_heartbeat_visible": true,
+    "confirmed_cost_and_unknown_reservations_separate": true,
+    "full_exports_deferred_while_running": true
+  },
+  "completion_artifacts": [
+    "audit.json",
+    "completion.json",
+    "results.md"
+  ],
+  "accounting_note": "Known usage is confirmed at recorded rates; 17 missing responses retain their entire original maximum. No unknown request is replayed and no zero-cost receipt is invented."
+}
