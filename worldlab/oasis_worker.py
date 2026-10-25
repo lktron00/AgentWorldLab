@@ -58,8 +58,8 @@ class OasisWorld:
                     edges.add((aid, 0))
             for source, target in sorted(edges):
                 self.check(await p.follow(source, target))
-            result = self.check(await p.create_post(1, "SEÑAL SINTÉTICA: el registro Orion podría estar comprometido. Sin verificar."))
-            p.db.execute("INSERT INTO worldlab_labels VALUES (?, 0)", (result["post_id"],))
+            result = self.check(await p.create_post(1, request["content"]))
+            p.db.execute("INSERT INTO worldlab_labels VALUES (?, ?)", (result["post_id"], int(request["verified"])))
             p.db.commit()
             return self.snapshot()
         if cmd == "action":

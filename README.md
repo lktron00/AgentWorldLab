@@ -1,5 +1,7 @@
 # Agent World Lab
 
+[![Real engine integration](https://github.com/lktron00/AgentWorldLab/actions/workflows/ci.yml/badge.svg)](https://github.com/lktron00/AgentWorldLab/actions/workflows/ci.yml)
+
 An open-source laboratory for reproducible multi-agent experiments. The first prototype connects **AgentSociety 2 + OASIS + OpenEnv** through real runtime integrations.
 
 Create a community, introduce a signal, watch it spread, checkpoint the world, and compare two policies from exactly the same starting state. A local dashboard and a typed Python client use the same OpenEnv WebSocket API.
@@ -8,12 +10,25 @@ Create a community, introduce a signal, watch it spread, checkpoint the world, a
 
 ## Quick start
 
-Requires Git and [uv](https://docs.astral.sh/uv/getting-started/installation/). Tested on macOS ARM64 with Python 3.11/3.12; Linux support has not yet been verified. Bootstrap downloads Python, pinned upstream source and dependencies, including PyTorch. Allow several GB of disk space. No API key or model download is needed to run the included experiment.
+Requires Git and [uv](https://docs.astral.sh/uv/getting-started/installation/). Supported installation targets are macOS ARM64 and Linux ARM64/x86_64; see [VALIDATION.md](VALIDATION.md) for completed platform checks. Bootstrap downloads Python 3.11/3.12, pinned upstream source and dependencies, including CPU PyTorch. Allow several GB of disk space. No API key or model download is needed to run the included experiment.
 
 ```sh
+git clone https://github.com/lktron00/AgentWorldLab.git
+cd AgentWorldLab
 python3 scripts/bootstrap.py
 ./scripts/serve
 ```
+
+On Debian/Ubuntu, install native libraries first:
+`sudo apt-get install build-essential libmagic1 libcairo2 libgomp1`. On Apple Silicon, use a
+native ARM build of uv; bootstrap detects an Intel-only installation.
+
+With Docker Compose, use `docker compose up --build` from the cloned repository.
+The first build downloads the same pinned dependencies; subsequent starts reuse
+the image. Data persists in a named volume. The published port is bound to
+`127.0.0.1`; keep that binding. Stop with `docker compose down` (without `-v` to
+preserve experiments). Docker Desktop needs enough memory for Python and Ray;
+8 GB allocated to Docker is a starting recommendation, not a measured minimum.
 
 Open **http://127.0.0.1:8765**. The first world may take 30–90 seconds to start Ray and import upstream modules. Later ticks are much faster.
 
@@ -95,6 +110,14 @@ Restore or branch with `client.reset(checkpoint_id="…", policy="friction")`. O
 
 ## Architecture and reproducibility
 
+For JSON scenarios, multi-seed comparisons and connecting your own AI agent,
+see [Extending an experiment](docs/extending.md). For example:
+
+```sh
+.venv-api/bin/python examples/compare.py --seeds 7 8 9 \
+  --scenario scenarios/diffusion.json --output data/comparison.json
+```
+
 ```text
 Dashboard / external agent
             │ OpenEnv WebSocket
@@ -126,7 +149,8 @@ Recorded replay means reading saved frames. Re-running means executing policies 
 ```text
 worldlab/             Controller, adapters, contracts and typed client
 web/                  Local dashboard (HTML/CSS/JS, no CDN or build step)
-examples/             External agent example
+examples/             External agent and paired experiment runners
+scenarios/            Editable JSON scenario definitions
 tests/                Contract tests + real three-engine WebSocket integration
 requirements/         Separate runtime locks
 upstreams.json        Immutable source revisions
@@ -141,6 +165,7 @@ data/logs/            Controller diagnostics (gitignored)
 ```sh
 ./scripts/test tests/test_contracts.py -q
 ./scripts/test tests/test_integration.py -q
+./scripts/test -q
 ```
 
 Integration tests start a local TCP server, connect the real `EnvClient`, schedule real Ray tasks, and inspect real OASIS SQLite rows. They verify state continuity, identical continuation, policy divergence, external actions, rejection without clock advancement, replay/export and recovery in a fresh process. Initial imports make the first test slower.
@@ -151,9 +176,12 @@ Integration tests start a local TCP server, connect the real `EnvClient`, schedu
 - Agent-scoped observations and permissions, separate experiment operator credentials.
 - Multiple external agents in one shared world, with an explicit simultaneous-action contract.
 - Scenario packages beyond social diffusion; benchmark against observed data before claiming realism.
-- Portable container images, Linux CI and scalable shared worker infrastructure.
+- Scalable shared worker infrastructure and additional platform coverage.
 
-The server binds to loopback and has no authentication or tenant isolation. Keep it local; public hosting requires additional work. Local checkpoints contain data and trusted code provenance, and are not an untrusted artifact import format.
+The native server binds to loopback; Docker Compose publishes only on the host's loopback interface. HTTP and WebSocket requests enforce local Host and same-origin browser access. There is no authentication or tenant isolation. Keep it local; public hosting requires additional work. Local checkpoints contain data and trusted code provenance, and are not an untrusted artifact import format. See [SECURITY.md](SECURITY.md).
+
+Contributions are welcome: [CONTRIBUTING.md](CONTRIBUTING.md),
+[release notes](CHANGELOG.md), and [issues](https://github.com/lktron00/AgentWorldLab/issues).
 
 ## License
 

@@ -43,21 +43,22 @@ def draw(seed: int, step: int, agent: int, root: int) -> float:
     return int.from_bytes(digest[:8], "big") / 2**64
 
 
-def feed_for(snapshot: dict, agent_id: int) -> list[dict]:
+def feed_for(snapshot: dict, agent_id: int, limit=12) -> list[dict]:
     followed = {e[1] for e in snapshot["edges"] if e[0] == agent_id}
     posts = [p for p in snapshot["posts"] if p["user_id"] in followed]
-    return sorted(posts, key=lambda p: p["post_id"], reverse=True)[:12]
+    return sorted(posts, key=lambda p: p["post_id"], reverse=True)[:limit]
 
 
-def choose_action(snapshot: dict, agent_id: int, seed: int, step: int, policy: str) -> dict:
+def choose_action(snapshot: dict, agent_id: int, seed: int, step: int, policy: str, scenario=None) -> dict:
     """Explicit toy behavior, not a calibrated model of people or LLMs."""
+    scenario = scenario or {}
     already_shared = {p["root_id"] for p in snapshot["posts"] if p["user_id"] == agent_id}
-    for post in feed_for(snapshot, agent_id):
+    for post in feed_for(snapshot, agent_id, scenario.get("feed_limit", 12)):
         if post["root_id"] in already_shared:
             continue
         probability = 0.6 + (agent_id % 4) * 0.1
         if policy == "friction" and not post["verified"]:
-            probability *= 0.2
+            probability *= scenario.get("friction_multiplier", 0.2)
         if draw(seed, step, agent_id, post["root_id"]) < probability:
             return {"kind": "repost", "post_id": post["root_id"]}
     return {"kind": "wait"}

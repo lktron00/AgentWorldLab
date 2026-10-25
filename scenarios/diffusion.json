@@ -1,0 +1,7 @@
+{
+  "max_steps": 30,
+  "initial_content": "SYNTHETIC SIGNAL: the Orion registry may be compromised. Unverified.",
+  "initial_verified": false,
+  "friction_multiplier": 0.2,
+  "feed_limit": 12
+}

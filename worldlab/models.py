@@ -30,3 +30,4 @@ class LabObservation(Observation):
 class LabState(State):
     run_id: str | None = None
     status: str = "uninitialized"
+    error: str | None = None

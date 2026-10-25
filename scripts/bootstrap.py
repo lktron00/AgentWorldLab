@@ -4,16 +4,22 @@ import json
 import platform
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 def run(*args, cwd=ROOT):
-    subprocess.run(args, cwd=cwd, check=True)
+    print("+", " ".join(map(str, args)), flush=True)
+    subprocess.run(args, cwd=cwd, check=True, timeout=1200)
 
 
 def main():
+    system, machine = platform.system(), platform.machine()
+    if not ((system == "Darwin" and machine == "arm64") or
+            (system == "Linux" and machine in {"aarch64", "x86_64"})):
+        raise SystemExit("Supported targets: macOS ARM64 and Linux ARM64/x86_64. On other hosts, use Docker.")
     if not shutil.which("uv") or not shutil.which("git"):
         raise SystemExit("Install uv and Git first. See README.md.")
     uv = shutil.which("uv")
@@ -32,11 +38,18 @@ def main():
     for name, spec in pins.items():
         source = vendor / name
         if not source.exists():
-            source.mkdir()
-            run("git", "init", "-q", cwd=source)
-            run("git", "remote", "add", "origin", spec["url"], cwd=source)
-            run("git", "fetch", "--depth=1", "origin", spec["commit"], cwd=source)
-            run("git", "checkout", "--detach", "FETCH_HEAD", cwd=source)
+            # Never mistake an interrupted download for an installed upstream.
+            staging = Path(tempfile.mkdtemp(prefix=f".{name}-", dir=vendor))
+            try:
+                run("git", "init", "-q", cwd=staging)
+                run("git", "remote", "add", "origin", spec["url"], cwd=staging)
+                run("git", "fetch", "--depth=1", "origin", spec["commit"], cwd=staging)
+                run("git", "checkout", "--detach", "FETCH_HEAD", cwd=staging)
+                staging.rename(source)
+            except BaseException:
+                # This directory was created by this invocation, never user code.
+                shutil.rmtree(staging, ignore_errors=True)
+                raise
         revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=source, text=True).strip()
         dirty = subprocess.check_output(["git", "status", "--porcelain"], cwd=source, text=True).strip()
         if revision != spec["commit"] or dirty:

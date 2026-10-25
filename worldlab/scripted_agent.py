@@ -12,7 +12,7 @@ class LabAgent(AgentBase):
 
     async def step(self, tick: int, t: datetime) -> str:
         context = self._service_proxy.env
-        self.intent = choose_action(context["snapshot"], self.id, context["seed"], context["step"], context["policy"])
+        self.intent = choose_action(context["snapshot"], self.id, context["seed"], context["step"], context["policy"], context["scenario"])
         self._step_count += 1
         self._current_time = t
         return self.intent["kind"]

@@ -2,12 +2,12 @@ const $ = id => document.getElementById(id);
 let socket, pending, latest, frames = [], checkpoint, busy = false, running = false;
 const notice = (message, error = false) => { $('notice').textContent = message; $('notice').className = error ? 'error' : ''; };
 function controls() {
-  const ready = !!latest && !busy && !latest.done;
+  const ready = !!latest && latest.status === 'paused' && !busy && !latest.done;
   for (const id of ['step','run','publish']) $(id).disabled = !ready;
   $('create').disabled = busy;
-  $('save').disabled = !latest || busy;
+  $('save').disabled = !latest || latest.status !== 'paused' || busy;
   $('restore').disabled = !checkpoint || busy;
-  $('compare').disabled = !checkpoint || busy || checkpoint.step > 25;
+  $('compare').disabled = !checkpoint || busy || checkpoint.step + 5 > (checkpoint.max_steps ?? 30);
   $('live').disabled = !latest || busy;
   $('timeline').disabled = busy || frames.length < 2;
   $('pause').hidden = !running;
@@ -15,7 +15,17 @@ function controls() {
 async function operation(fn) {
   if (busy) return;
   busy = true; controls();
-  try { await fn(); } catch (e) { notice(e.message, true); }
+  try { await fn(); } catch (e) {
+    if (latest) {
+      try {
+        const state = await send('state');
+        if (state.status === 'failed' || state.run_id !== latest.run_id) {
+          latest = {...latest, status:'failed'}; render(latest);
+        }
+      } catch { latest = {...latest, status:'disconnected'}; render(latest); }
+    }
+    notice(e.message, true);
+  }
   finally { busy = false; running = false; controls(); }
 }
 async function connect() {
@@ -26,7 +36,10 @@ async function connect() {
     if (message.type === 'error') { pending?.reject(new Error(message.error?.message || message.message || JSON.stringify(message))); pending = null; return; }
     if (pending) { const resolve = pending.resolve; pending = null; resolve(message.data ?? message); }
   };
-  socket.onclose = () => { pending?.reject(new Error('Se cerró la sesión. Los datos grabados permanecen guardados.')); pending = null; };
+  socket.onclose = () => {
+    pending?.reject(new Error('Se cerró la sesión. Los datos grabados permanecen guardados.')); pending = null;
+    if(latest) { latest={...latest,status:'disconnected'}; render(latest); controls(); }
+  };
   await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = () => reject(new Error('No se pudo conectar al servidor')); });
 }
 async function send(type, data = {}) {
@@ -54,9 +67,9 @@ async function step(action = {kind:'wait'}) {
 }
 function render(state, replay = false) {
   const m = state.metrics;
-  $('status').textContent = replay ? 'REPLAY' : state.done ? 'FINALIZADO' : 'PAUSADO';
+  $('status').textContent = replay ? 'REPLAY' : state.status === 'failed' ? 'FALLO · RESTAURAR' : state.status === 'disconnected' ? 'DESCONECTADO' : state.done ? 'FINALIZADO' : 'PAUSADO';
   $('clock').textContent = new Date(state.time).toISOString().slice(11,16);
-  $('step-label').textContent = `PASO ${String(state.step).padStart(2,'0')} / 30`;
+  $('step-label').textContent = `PASO ${String(state.step).padStart(2,'0')} / ${state.scenario.max_steps}`;
   $('unverified-count').textContent = `${m.unverified_sharers} / ${m.population}`;
   $('unverified-rate').textContent = `${Math.round(100*m.unverified_share_rate)}% de la comunidad`;
   $('verified-count').textContent = m.verified_sharers;
@@ -109,7 +122,7 @@ $('pause').onclick=()=>{running=false;notice('Pausa solicitada; terminando el pa
 $('publish').onclick=()=>operation(async()=>{await step({kind:'post',content:$('content').value,verified:$('verified').checked});notice('Tu agente publicó. La comunidad completó un paso.');});
 $('save').onclick=()=>operation(async()=>{
   const response=await fetch(`/lab/runs/${latest.run_id}/checkpoint`,{method:'POST'}); const result=await response.json(); if(!response.ok)throw new Error(result.detail);
-  checkpoint=result; localStorage.setItem("worldlab-checkpoint",JSON.stringify(result)); $('checkpoint-label').textContent=`Checkpoint ${result.checkpoint_id.slice(0,8)} · paso ${result.step}. Listo para restaurar o comparar.`;
+  checkpoint={...result,max_steps:latest.scenario.max_steps}; localStorage.setItem("worldlab-checkpoint",JSON.stringify(checkpoint)); $('checkpoint-label').textContent=`Checkpoint ${result.checkpoint_id.slice(0,8)} · paso ${result.step}. Listo para restaurar o comparar.`;
   notice('Estado completo guardado y verificado con hashes SHA-256.');
 });
 $('restore').onclick=()=>operation(async()=>{notice('Restaurando agentes, reloj y base OASIS…');await reset({checkpoint_id:checkpoint.checkpoint_id});notice(`Restaurado en el paso ${latest.step}.`);});

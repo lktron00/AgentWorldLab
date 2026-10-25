@@ -7,4 +7,4 @@
 - The default experiment is offline and scripted. Do not introduce paid model calls or telemetry into the baseline.
 - Do not claim scientific validity from the toy diffusion scenario.
 - Never edit `vendor/` implicitly. Pin deliberate upstream upgrades in `upstreams.json`, refresh the appropriate runtime lock and run integration tests.
-- Keep the server bound to loopback until authentication and isolation are implemented.
+- Keep the native server bound to loopback until authentication and tenant isolation are implemented. Containers may listen on their isolated network, but host port publishing must use `127.0.0.1` (as in `compose.yaml`). Never recommend public hosting.

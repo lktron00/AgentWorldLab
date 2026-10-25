@@ -32,6 +32,8 @@ from agentsociety2.society import AgentSociety
 from agentsociety2.storage.replay_proxy import ReplayProxy
 
 from .rpc import Worker
+from .checkpoints import inventory, validate_checkpoint
+from .scenarios import validate_scenario
 
 
 class NoLLM:
@@ -64,46 +66,45 @@ class LabRouter(RouterBase):
 
 
 class Controller:
-    society = None
-    oasis = None
-    failed = False
+    def __init__(self):
+        self.society = None
+        self.oasis = None
+        self.failed = False
+        # Capture the executing revision once; a developer editing a source file
+        # while this process runs must not relabel an old world as the new code.
+        self.code_hashes = self.adapter_hashes()
+        self.upstreams = read_json(ROOT / "upstreams.json")
 
-    async def reset(self, *, seed=7, population=20, policy=None, checkpoint_id=None, **kwargs):
+    async def reset(self, *, seed=7, population=20, policy=None, checkpoint_id=None, scenario=None, **kwargs):
         if type(seed) is not int or seed < 0 or seed > 2**32 - 1:
             raise ValueError("Seed must be an integer from 0 to 2^32-1")
         if type(population) is not int or not 4 <= population <= 100:
             raise ValueError("Population must be between 4 and 100")
         if policy is not None:
             policy_name(policy)
+        parameters = validate_scenario(scenario)
+        if checkpoint_id and scenario is not None:
+            raise ValueError("A checkpoint keeps its scenario; only policy may be changed")
         source = None
         if checkpoint_id:
             source = DATA / "checkpoints" / safe_id(checkpoint_id)
-            manifest = read_json(source / "manifest.json")
-            if manifest.get("schema_version") != 1:
-                raise ValueError("Unsupported checkpoint version")
-            if manifest.get("upstreams") != read_json(ROOT / "upstreams.json"):
-                raise ValueError("Checkpoint requires different upstream revisions")
-            if manifest.get("adapter_hashes") != self.adapter_hashes():
-                raise ValueError("Checkpoint policy/adapter version differs from this installation")
-            for filename, digest in manifest["files"].items():
-                file = (source / filename).resolve()
-                if not file.is_relative_to(source.resolve()) or file.is_symlink():
-                    raise ValueError("Invalid checkpoint path")
-                if hashlib.sha256(file.read_bytes()).hexdigest() != digest:
-                    raise ValueError(f"Checkpoint integrity failed: {filename}")
+            validate_checkpoint(source, upstreams=self.upstreams, adapter_hashes=self.code_hashes)
+        self.failed = True
         await self.close_world()
-        self.failed = False
         self.run_id = uuid.uuid4().hex
         self.run_dir = DATA / "runs" / self.run_id
         if source:
-            shutil.copytree(source, self.run_dir, ignore=shutil.ignore_patterns("manifest.json"))
+            shutil.copytree(source, self.run_dir)
+            (self.run_dir / "manifest.json").unlink()
+            if inventory(self.run_dir) != read_json(source / "manifest.json")["files"]:
+                raise ValueError("Checkpoint changed while restoring")
             self.config = read_json(self.run_dir / "scenario.json")
             if policy is not None:
                 self.config["policy"] = policy
             self.config["parent_checkpoint"] = checkpoint_id
         else:
             self.run_dir.mkdir(parents=True)
-            self.config = {"seed": seed, "population": population, "policy": policy or "open", "max_steps": 30}
+            self.config = {"seed": seed, "population": population, "policy": policy or "open", **parameters}
         write_json(self.run_dir / "scenario.json", self.config)
         provenance = self.run_dir / "provenance"
         provenance.mkdir(parents=True, exist_ok=True)
@@ -111,7 +112,8 @@ class Controller:
         self.oasis = Worker(".venv-oasis", "worldlab.oasis_worker", self.run_dir / "oasis.log")
         self.oasis.call("open", database=str(self.run_dir / "oasis.sqlite"))
         if not source:
-            self.oasis.call("seed", population=population, seed=seed)
+            self.oasis.call("seed", population=population, seed=seed,
+                            content=self.config["initial_content"], verified=self.config["initial_verified"])
         if not ray.is_initialized():
             ray.init(num_cpus=2, include_dashboard=False, object_store_memory=100_000_000,
                      log_to_driver=False, _node_ip_address="127.0.0.1",
@@ -130,7 +132,9 @@ class Controller:
         await self.society.init()
         await self.society.to_workspace()
         state = self.snapshot()
+        state["status"] = "paused"
         self.save_frame(state)
+        self.failed = False
         return state
 
     def event(self, actor, action, result):
@@ -179,13 +183,21 @@ class Controller:
                 self.event(0, action, result)
             frozen = self.oasis.call("snapshot")
             self.proxy.env = {"snapshot": frozen, "seed": self.config["seed"],
-                              "step": self.society.step_count, "policy": self.config["policy"]}
+                              "step": self.society.step_count, "policy": self.config["policy"], "scenario": self.config}
             await self.society.step(TICK_SECONDS)
             state = self.snapshot()
             self.save_frame(state)
             return state
-        except Exception:
+        except Exception as exc:
             self.failed = True  # Never continue from a partially committed tick.
+            # Keep the last committed world, but make its failure visible to
+            # clients and to operators inspecting runs after a process exit.
+            try:
+                last = read_json(self.run_dir / "latest.json")
+                last.update(status="failed", error=str(exc))
+                write_json(self.run_dir / "latest.json", last)
+            except Exception:
+                traceback.print_exc(file=sys.stderr)
             raise
 
     async def checkpoint(self):
@@ -198,9 +210,8 @@ class Controller:
         shutil.copytree(self.run_dir, staging, ignore=shutil.ignore_patterns("*.log", "*.sqlite", "__pycache__"))
         self.oasis.call("backup", path=str(staging / "oasis.sqlite"))
         manifest = {"schema_version": 1, "source_run": self.run_id, "step": self.society.step_count,
-                    "upstreams": read_json(ROOT / "upstreams.json"), "adapter_hashes": self.adapter_hashes(),
-                    "files": {str(p.relative_to(staging)): hashlib.sha256(p.read_bytes()).hexdigest()
-                              for p in sorted(staging.rglob("*")) if p.is_file()}}
+                    "upstreams": self.upstreams, "adapter_hashes": self.code_hashes,
+                    "files": inventory(staging)}
         write_json(staging / "manifest.json", manifest)
         staging.rename(target)
         return {"checkpoint_id": checkpoint_id, "step": self.society.step_count}
@@ -208,7 +219,7 @@ class Controller:
     @staticmethod
     def adapter_hashes():
         return {name: hashlib.sha256((ROOT / "worldlab" / name).read_bytes()).hexdigest()
-                for name in ("common.py", "scripted_agent.py", "controller.py", "oasis_worker.py")}
+                for name in ("common.py", "scripted_agent.py", "controller.py", "oasis_worker.py", "checkpoints.py", "scenarios.py")}
 
     async def close_world(self):
         if self.society:
@@ -223,6 +234,7 @@ async def main():
     controller = Controller()
     try:
         for line in sys.stdin:
+            command = None
             try:
                 request = json.loads(line)
                 command = request.pop("command")
@@ -243,7 +255,7 @@ async def main():
                 response = {"ok": True, "result": result}
             except Exception as exc:
                 traceback.print_exc(file=sys.stderr)
-                response = {"ok": False, "error": str(exc)}
+                response = {"ok": False, "error": str(exc), "kind": type(exc).__name__, "failed": controller.failed}
             WIRE.write(json.dumps(response, ensure_ascii=False) + "\n")
             WIRE.flush()
             if command == "close":

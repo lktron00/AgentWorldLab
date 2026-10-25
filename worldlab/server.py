@@ -2,6 +2,7 @@
 import io
 import os
 import zipfile
+from contextlib import nullcontext
 
 os.environ["ENABLE_WEB_INTERFACE"] = "false"
 os.environ["GRADIO_ANALYTICS_ENABLED"] = "False"
@@ -14,9 +15,11 @@ from openenv.core.env_server import create_app
 from .common import DATA, ROOT, read_json, safe_id
 from .environment import ACTIVE, LabEnvironment
 from .models import LabAction, LabObservation, LabState
+from .security import LocalAccessMiddleware
 
 app = create_app(LabEnvironment, LabAction, LabObservation, env_name="agent_world_lab",
                  max_concurrent_envs=2, state_cls=LabState)
+app.add_middleware(LocalAccessMiddleware)
 app.mount("/assets", StaticFiles(directory=ROOT / "web"), name="assets")
 
 
@@ -28,7 +31,7 @@ def index():
 def run_path(run_id):
     try:
         path = DATA / "runs" / safe_id(run_id)
-        if not path.is_dir():
+        if path.is_symlink() or not path.is_dir():
             raise ValueError("Run not found")
         return path
     except ValueError as exc:
@@ -43,7 +46,10 @@ def list_runs():
 
 @app.get("/lab/runs/{run_id}/frames")
 def frames(run_id: str):
-    return [read_json(p) for p in sorted((run_path(run_id) / "frames").glob("*.json"))]
+    path = run_path(run_id)
+    env = ACTIVE.get(run_id)
+    with env.lock if env else nullcontext():
+        return [read_json(p) for p in sorted((path / "frames").glob("*.json"))]
 
 
 @app.post("/lab/runs/{run_id}/checkpoint")
@@ -62,8 +68,9 @@ def checkpoint(run_id: str):
 def export(run_id: str):
     path = run_path(run_id)
     archive = io.BytesIO()
-    # Export immutable observations and metadata, never copy a live SQLite file.
-    with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as zipped:
+    env = ACTIVE.get(run_id)
+    # Pin a tick boundary while reading mutable metadata and the event journal.
+    with env.lock if env else nullcontext(), zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as zipped:
         for file in sorted(path.rglob("*")):
             if file.is_file() and file.suffix in {".json", ".jsonl"}:
                 zipped.write(file, file.relative_to(path))

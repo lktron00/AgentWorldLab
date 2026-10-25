@@ -1,0 +1,45 @@
+name: Real engine integration
+
+on:
+  push:
+    branches: [main, "codex/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      RAY_USAGE_STATS_ENABLED: "0"
+      MEM0_TELEMETRY: "False"
+      ANONYMIZED_TELEMETRY: "False"
+      GRADIO_ANALYTICS_ENABLED: "False"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: "0.11.19"
+          enable-cache: true
+          cache-dependency-glob: |
+            requirements/*.txt
+            upstreams.json
+      - name: Native libraries
+        run: sudo apt-get update && sudo apt-get install -y build-essential libmagic1 libcairo2 libgomp1
+      - name: Install immutable upstreams and isolated runtimes
+        run: python3 scripts/bootstrap.py
+      - name: Contracts, failures, isolation and three real engines
+        run: ./scripts/test -q --basetemp=test-results
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for path in Path('test-results').rglob('*.log'):
+              print(f'\n{path}\n{path.read_text(errors="replace")[-8000:]}')
+          PY
