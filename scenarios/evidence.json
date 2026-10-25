@@ -1,0 +1,7 @@
+{
+  "max_steps": 30,
+  "initial_content": "SYNTHETIC SCENARIO RECORD — Orion registry status check. The scenario's test log records: check_id=orion-017; timestamp=2026-01-01T00:00:00Z; service_status=operational; validation_checks_passed=12/12. This is an invented simulation record, not a statement about a real service.",
+  "initial_verified": true,
+  "friction_multiplier": 0.2,
+  "feed_limit": 12
+}

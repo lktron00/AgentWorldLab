@@ -13,19 +13,34 @@ from fastapi.staticfiles import StaticFiles
 from openenv.core.env_server import create_app
 
 from .common import DATA, ROOT, read_json, safe_id
+from . import __version__
 from .environment import ACTIVE, LabEnvironment
 from .models import LabAction, LabObservation, LabState
 from .security import LocalAccessMiddleware
+from .experiment_catalog import router as experiment_router
 
 app = create_app(LabEnvironment, LabAction, LabObservation, env_name="agent_world_lab",
                  max_concurrent_envs=2, state_cls=LabState)
+app.version = __version__
 app.add_middleware(LocalAccessMiddleware)
+app.include_router(experiment_router)
 app.mount("/assets", StaticFiles(directory=ROOT / "web"), name="assets")
+
+
+@app.get("/lab/info")
+def info():
+    return {"name": "Agent World Lab", "version": __version__, "mode": "local-operator",
+            "upstreams": read_json(ROOT / "upstreams.json")}
 
 
 @app.get("/", include_in_schema=False)
 def index():
     return FileResponse(ROOT / "web/index.html")
+
+
+@app.get("/experiments", include_in_schema=False)
+def experiment_catalog():
+    return FileResponse(ROOT / "web/experiments.html")
 
 
 def run_path(run_id):

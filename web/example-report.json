@@ -1,0 +1,379 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "started_at": "2026-10-25T03:48:30.790287+00:00",
+  "mode": "real-openai",
+  "candidate": {
+    "provider": "openai",
+    "model": "gpt-6-luna",
+    "effort": "low"
+  },
+  "baseline": "first-visible-repost-v1",
+  "scenario": {
+    "max_steps": 30,
+    "initial_content": "SEÑAL SINTÉTICA: el registro Orion podría estar comprometido. Sin verificar.",
+    "initial_verified": false,
+    "friction_multiplier": 0.2,
+    "feed_limit": 12
+  },
+  "config": {
+    "seeds": [
+      7,
+      8
+    ],
+    "population": 20,
+    "warmup": 2,
+    "steps": 3
+  },
+  "price_book": {
+    "currency": "USD",
+    "checked_at": "2026-10-25",
+    "service_tier": "default",
+    "context": "Text only, <=272000 input tokens, standard global endpoint",
+    "models": {
+      "gpt-6-luna": {
+        "input": "0.10",
+        "cached_input": "0.01",
+        "cache_write": "0.125",
+        "output": "0.50",
+        "source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+      },
+      "gpt-6.1-sol": {
+        "input": "2.00",
+        "cached_input": "0.10",
+        "cache_write": "2.50",
+        "output": "10.00",
+        "source": "https://developers.openai.com/api/docs/models/gpt-6.1-sol"
+      }
+    }
+  },
+  "experiments": [
+    {
+      "seed": 7,
+      "checkpoint_id": "51ec3ba13a274afa9ef4b835c98ab7b7",
+      "initial_world_sha256": "60774b95ae68cae9ee647deb5491585bce3ec9eb780847dbfbec424916cab13b",
+      "branches": {
+        "baseline": {
+          "run_id": "6abc3f2d2b464f039bb982ca09e24cab",
+          "initial_world_sha256": "60774b95ae68cae9ee647deb5491585bce3ec9eb780847dbfbec424916cab13b",
+          "status": "completed",
+          "trajectory": [
+            {
+              "posts": 6,
+              "reposts": 5,
+              "unverified_sharers": 6,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.3,
+              "population": 20,
+              "step": 2,
+              "signal_sharers": 6,
+              "external_signal_reposts": 0,
+              "external_posts": 0,
+              "external_reposts": 0,
+              "external_unverified_posts": 0
+            },
+            {
+              "posts": 10,
+              "reposts": 9,
+              "unverified_sharers": 9,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.45,
+              "population": 20,
+              "step": 3,
+              "signal_sharers": 9,
+              "external_signal_reposts": 1,
+              "external_posts": 1,
+              "external_reposts": 1,
+              "external_unverified_posts": 1
+            },
+            {
+              "posts": 17,
+              "reposts": 16,
+              "unverified_sharers": 16,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.8,
+              "population": 20,
+              "step": 4,
+              "signal_sharers": 16,
+              "external_signal_reposts": 1,
+              "external_posts": 1,
+              "external_reposts": 1,
+              "external_unverified_posts": 1
+            },
+            {
+              "posts": 19,
+              "reposts": 18,
+              "unverified_sharers": 18,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.9,
+              "population": 20,
+              "step": 5,
+              "signal_sharers": 18,
+              "external_signal_reposts": 1,
+              "external_posts": 1,
+              "external_reposts": 1,
+              "external_unverified_posts": 1
+            }
+          ],
+          "estimated_cost_usd": "0.0000000000",
+          "unresolved_calls": 0
+        },
+        "candidate": {
+          "run_id": "4743051e251647f294ea77c6b2aa9d5b",
+          "initial_world_sha256": "60774b95ae68cae9ee647deb5491585bce3ec9eb780847dbfbec424916cab13b",
+          "status": "completed",
+          "trajectory": [
+            {
+              "posts": 6,
+              "reposts": 5,
+              "unverified_sharers": 6,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.3,
+              "population": 20,
+              "step": 2,
+              "signal_sharers": 6,
+              "external_signal_reposts": 0,
+              "external_posts": 0,
+              "external_reposts": 0,
+              "external_unverified_posts": 0
+            },
+            {
+              "posts": 13,
+              "reposts": 11,
+              "unverified_sharers": 11,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.55,
+              "population": 20,
+              "step": 3,
+              "signal_sharers": 8,
+              "external_signal_reposts": 0,
+              "external_posts": 1,
+              "external_reposts": 0,
+              "external_unverified_posts": 1
+            },
+            {
+              "posts": 24,
+              "reposts": 22,
+              "unverified_sharers": 18,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.9,
+              "population": 20,
+              "step": 4,
+              "signal_sharers": 13,
+              "external_signal_reposts": 0,
+              "external_posts": 1,
+              "external_reposts": 0,
+              "external_unverified_posts": 1
+            },
+            {
+              "posts": 32,
+              "reposts": 30,
+              "unverified_sharers": 20,
+              "verified_sharers": 0,
+              "unverified_share_rate": 1.0,
+              "population": 20,
+              "step": 5,
+              "signal_sharers": 15,
+              "external_signal_reposts": 0,
+              "external_posts": 1,
+              "external_reposts": 0,
+              "external_unverified_posts": 1
+            }
+          ],
+          "estimated_cost_usd": "0.0002499000",
+          "unresolved_calls": 0
+        }
+      },
+      "estimated_model_cost_usd": "0.0002499000",
+      "candidate_minus_baseline": {
+        "signal_sharers": -3,
+        "external_signal_reposts": -1,
+        "unverified_sharers": 2,
+        "external_reposts": -1,
+        "external_unverified_posts": 0
+      }
+    },
+    {
+      "seed": 8,
+      "checkpoint_id": "a2e660d27ca1451aa31904b6ec35c82d",
+      "initial_world_sha256": "00caf25dafdc2730f4fc20714e8299af023d7db5908de53f74b8935aaac01da2",
+      "branches": {
+        "baseline": {
+          "run_id": "bbf04bc0952147f88abdafee7dd95689",
+          "initial_world_sha256": "00caf25dafdc2730f4fc20714e8299af023d7db5908de53f74b8935aaac01da2",
+          "status": "completed",
+          "trajectory": [
+            {
+              "posts": 9,
+              "reposts": 8,
+              "unverified_sharers": 9,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.45,
+              "population": 20,
+              "step": 2,
+              "signal_sharers": 9,
+              "external_signal_reposts": 0,
+              "external_posts": 0,
+              "external_reposts": 0,
+              "external_unverified_posts": 0
+            },
+            {
+              "posts": 15,
+              "reposts": 14,
+              "unverified_sharers": 14,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.7,
+              "population": 20,
+              "step": 3,
+              "signal_sharers": 14,
+              "external_signal_reposts": 1,
+              "external_posts": 1,
+              "external_reposts": 1,
+              "external_unverified_posts": 1
+            },
+            {
+              "posts": 18,
+              "reposts": 17,
+              "unverified_sharers": 17,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.85,
+              "population": 20,
+              "step": 4,
+              "signal_sharers": 17,
+              "external_signal_reposts": 1,
+              "external_posts": 1,
+              "external_reposts": 1,
+              "external_unverified_posts": 1
+            },
+            {
+              "posts": 20,
+              "reposts": 19,
+              "unverified_sharers": 19,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.95,
+              "population": 20,
+              "step": 5,
+              "signal_sharers": 19,
+              "external_signal_reposts": 1,
+              "external_posts": 1,
+              "external_reposts": 1,
+              "external_unverified_posts": 1
+            }
+          ],
+          "estimated_cost_usd": "0.0000000000",
+          "unresolved_calls": 0
+        },
+        "candidate": {
+          "run_id": "d5b9c130bf794ac5bd75625178ee0999",
+          "initial_world_sha256": "00caf25dafdc2730f4fc20714e8299af023d7db5908de53f74b8935aaac01da2",
+          "status": "completed",
+          "trajectory": [
+            {
+              "posts": 9,
+              "reposts": 8,
+              "unverified_sharers": 9,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.45,
+              "population": 20,
+              "step": 2,
+              "signal_sharers": 9,
+              "external_signal_reposts": 0,
+              "external_posts": 0,
+              "external_reposts": 0,
+              "external_unverified_posts": 0
+            },
+            {
+              "posts": 14,
+              "reposts": 13,
+              "unverified_sharers": 14,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.7,
+              "population": 20,
+              "step": 3,
+              "signal_sharers": 14,
+              "external_signal_reposts": 0,
+              "external_posts": 0,
+              "external_reposts": 0,
+              "external_unverified_posts": 0
+            },
+            {
+              "posts": 17,
+              "reposts": 16,
+              "unverified_sharers": 17,
+              "verified_sharers": 0,
+              "unverified_share_rate": 0.85,
+              "population": 20,
+              "step": 4,
+              "signal_sharers": 17,
+              "external_signal_reposts": 0,
+              "external_posts": 0,
+              "external_reposts": 0,
+              "external_unverified_posts": 0
+            },
+            {
+              "posts": 23,
+              "reposts": 21,
+              "unverified_sharers": 20,
+              "verified_sharers": 0,
+              "unverified_share_rate": 1.0,
+              "population": 20,
+              "step": 5,
+              "signal_sharers": 19,
+              "external_signal_reposts": 0,
+              "external_posts": 1,
+              "external_reposts": 0,
+              "external_unverified_posts": 1
+            }
+          ],
+          "estimated_cost_usd": "0.0002274000",
+          "unresolved_calls": 0
+        }
+      },
+      "estimated_model_cost_usd": "0.0002274000",
+      "candidate_minus_baseline": {
+        "signal_sharers": 0,
+        "external_signal_reposts": -1,
+        "unverified_sharers": 1,
+        "external_reposts": -1,
+        "external_unverified_posts": 0
+      }
+    }
+  ],
+  "cost": {
+    "currency": "USD",
+    "estimated_cost_usd": "0.0004773000",
+    "budget_usd": "0.1000000000",
+    "completed_calls": 6,
+    "unresolved_calls": 0,
+    "unresolved_reserved_usd": "0.0000000000",
+    "accounting": "estimated_from_reported_usage",
+    "input_tokens": 3358,
+    "output_tokens": 283,
+    "reasoning_tokens": 0
+  },
+  "summary": {
+    "pairs": 2,
+    "mean_candidate_minus_baseline": {
+      "signal_sharers": -1.5,
+      "external_signal_reposts": -1,
+      "unverified_sharers": 1.5,
+      "external_reposts": -1,
+      "external_unverified_posts": 0
+    }
+  },
+  "finished_at": "2026-10-25T03:49:25.308621+00:00",
+  "metric_schema": "initial-signal-v1",
+  "analysis": {
+    "at": "2026-10-25T03:50:26.584089+00:00",
+    "method": "Derived additional original-signal metrics from saved engine frames. No simulation or API call was repeated.",
+    "original_report_sha256": "4139444e898282b276c2224e557e1f1eeb42178fe381fa49d0d3ab037cdec0ec"
+  },
+  "example": true,
+  "example_note": "Sanitized synthetic run recorded on 2026-10-25. Provider/call IDs replaced; original usage and outcomes retained. Engine checkpoints are not bundled.",
+  "audit": {
+    "recovered_receipts": 0,
+    "journal_truncated": false,
+    "warnings": [],
+    "budget_exceeded": false
+  }
+}

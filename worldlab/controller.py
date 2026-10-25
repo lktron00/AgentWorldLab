@@ -162,12 +162,15 @@ class Controller:
         write_json(self.run_dir / "frames" / f'{state["step"]:04d}.json', state)
         write_json(self.run_dir / "latest.json", state)
 
-    async def step(self, action):
+    async def step(self, action, restricted=False):
         if self.society is None or self.failed:
             raise RuntimeError("Reset or restore a checkpoint before continuing")
         if self.society.step_count >= self.config["max_steps"]:
             raise ValueError("Episode finished; reset to start another")
         # Reject an invalid external action before changing either engine.
+        if restricted:
+            from .observations import agent_view, validate_agent_action
+            validate_agent_action(action, agent_view(self.snapshot()))
         kind = action["kind"]
         if kind not in {"wait", "post", "repost"}:
             raise ValueError("Unsupported action")
@@ -222,7 +225,7 @@ class Controller:
     @staticmethod
     def adapter_hashes():
         return {name: hashlib.sha256((ROOT / "worldlab" / name).read_bytes()).hexdigest()
-                for name in ("common.py", "scripted_agent.py", "controller.py", "oasis_worker.py", "checkpoints.py", "scenarios.py")}
+                for name in ("common.py", "scripted_agent.py", "controller.py", "oasis_worker.py", "checkpoints.py", "scenarios.py", "observations.py")}
 
     async def close_world(self):
         if self.society:
@@ -244,7 +247,7 @@ async def main():
                 if command == "reset":
                     result = await controller.reset(**request)
                 elif command == "step":
-                    result = await controller.step(request["action"])
+                    result = await controller.step(request["action"], restricted=request.get("restricted", False))
                 elif command == "state":
                     result = controller.snapshot()
                 elif command == "checkpoint":

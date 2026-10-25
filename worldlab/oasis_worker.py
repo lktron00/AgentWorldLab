@@ -48,7 +48,7 @@ class OasisWorld:
             for aid in range(count + 1):
                 self.check(await p.sign_up(aid, (f"agent-{aid}", "External" if aid == 0 else f"Agent {aid:02}", "Scripted test agent")))
             # Directed ring with two local links and a seed-dependent long link.
-            edges = set()
+            edges = {(0, 1), (0, 2)}  # External agent has an ordinary, limited feed.
             for aid in range(1, count + 1):
                 for offset in (1, 2, 5 + request["seed"] % 3):
                     target = (aid - 1 - offset) % count + 1

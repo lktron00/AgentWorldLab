@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.title="Agent World Lab" \
       org.opencontainers.image.description="Local experiments with AgentSociety 2, OASIS and OpenEnv" \
       org.opencontainers.image.source="https://github.com/lktron00/AgentWorldLab" \
       org.opencontainers.image.url="https://github.com/lktron00/AgentWorldLab" \
-      org.opencontainers.image.version="0.1.0"
+      org.opencontainers.image.version="0.2.0"
 
 ENV UV_PYTHON_INSTALL_DIR=/opt/python \
     UV_LINK_MODE=copy \
@@ -21,8 +21,11 @@ WORKDIR /app
 COPY upstreams.json ./
 COPY requirements ./requirements
 COPY scripts/bootstrap.py ./scripts/bootstrap.py
+COPY worldlab/__init__.py worldlab/source_integrity.py ./worldlab/
 RUN --mount=type=cache,target=/root/.cache/uv python scripts/bootstrap.py
 COPY . .
+ARG VCS_REF=unknown
+LABEL org.opencontainers.image.revision=$VCS_REF
 RUN useradd --create-home --uid 10001 worldlab \
     && mkdir -p /app/data \
     && chown worldlab:worldlab /app /app/data /app/vendor/* /app/vendor/*/.git

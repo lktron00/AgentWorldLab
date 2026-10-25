@@ -113,7 +113,7 @@ function feed(posts) {
 $('create').onclick=()=>operation(async()=>{
   notice('Creando mundo. Inicializando AgentSociety, Ray y OASIS…');
   await reset({seed:Number($('seed').value),population:Number($('population').value),policy:$('policy').value});
-  checkpoint=null; $('checkpoint-label').textContent='Guarda un punto de partida para comparar dos futuros.'; $('comparison').hidden=true;
+  checkpoint=null; localStorage.removeItem('worldlab-checkpoint'); $('checkpoint-label').textContent='Guarda un punto de partida para comparar dos futuros.'; $('comparison').hidden=true;
   notice('Mundo listo. Cada paso equivale a un minuto simulado.');
 });
 $('step').onclick=()=>operation(async()=>{ await step(); notice(`Paso ${latest.step} completado y guardado.`); });
@@ -122,7 +122,7 @@ $('pause').onclick=()=>{running=false;notice('Pausa solicitada; terminando el pa
 $('publish').onclick=()=>operation(async()=>{await step({kind:'post',content:$('content').value,verified:$('verified').checked});notice('Tu agente publicó. La comunidad completó un paso.');});
 $('save').onclick=()=>operation(async()=>{
   const response=await fetch(`/lab/runs/${latest.run_id}/checkpoint`,{method:'POST'}); const result=await response.json(); if(!response.ok)throw new Error(result.detail);
-  checkpoint={...result,max_steps:latest.scenario.max_steps}; localStorage.setItem("worldlab-checkpoint",JSON.stringify(checkpoint)); $('checkpoint-label').textContent=`Checkpoint ${result.checkpoint_id.slice(0,8)} · paso ${result.step}. Listo para restaurar o comparar.`;
+  checkpoint={...result,max_steps:latest.scenario.max_steps,ui_version:'0.2'}; localStorage.setItem("worldlab-checkpoint",JSON.stringify(checkpoint)); $('checkpoint-label').textContent=`Checkpoint ${result.checkpoint_id.slice(0,8)} · paso ${result.step}. Listo para restaurar o comparar.`;
   notice('Estado completo guardado y verificado con hashes SHA-256.');
 });
 $('restore').onclick=()=>operation(async()=>{notice('Restaurando agentes, reloj y base OASIS…');await reset({checkpoint_id:checkpoint.checkpoint_id});notice(`Restaurado en el paso ${latest.step}.`);});
@@ -153,9 +153,11 @@ $('timeline').oninput=()=>render(frames[Number($('timeline').value)],true);
 $('live').onclick=()=>{$('timeline').value=frames.length-1;render(latest);};
 try {
   const saved=JSON.parse(localStorage.getItem('worldlab-checkpoint') || 'null');
-  if(saved && /^[a-f0-9]{32}$/.test(saved.checkpoint_id) && Number.isInteger(saved.step)) {
+  if(saved && saved.ui_version === '0.2' && /^[a-f0-9]{32}$/.test(saved.checkpoint_id) && Number.isInteger(saved.step)) {
     checkpoint=saved;
     $('checkpoint-label').textContent=`Último checkpoint guardado: ${saved.checkpoint_id.slice(0,8)} · paso ${saved.step}. Puedes restaurarlo después de recargar.`;
+  } else if(saved) {
+    $('checkpoint-label').textContent='El último checkpoint pertenece a una versión anterior. Crea uno nuevo; los datos anteriores siguen en su carpeta.';
   }
 } catch { /* A stale browser preference must not prevent a new experiment. */ }
 controls();

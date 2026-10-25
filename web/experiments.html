@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Experimentos · Agent World Lab</title><link rel="stylesheet" href="/assets/style.css?v=0.2.0"></head>
+<body>
+<header><a class="brand" href="/"><span class="mark">◈</span> Agent World Lab <small>EXPERIMENTOS</small></a><a class="button" href="/">Volver al laboratorio ↗</a></header>
+<main class="catalog-main">
+  <div class="eyebrow">AGENTES EXTERNOS · COMPARACIONES REPRODUCIBLES</div>
+  <h1>De la decisión al resultado.</h1>
+  <p class="muted catalog-intro">Compara una política de IA con un baseline desde el mismo checkpoint. Revisa lo que observó el agente, las decisiones que tomó y cuánto costó cada experimento.</p>
+  <section class="catalog-start panel">
+    <div><div class="eyebrow">EXPLORA SIN CONFIGURAR UNA CLAVE</div><h2>Un experimento real, listo para leer.</h2><p class="muted">Dos semillas, seis decisiones de GPT-6 Luna y sus recibos de uso. Datos sintéticos; el resultado no predice el comportamiento de personas.</p><a class="button primary-link" href="/assets/example-report.html">Abrir informe de ejemplo ↗</a></div>
+    <div><h3>Ejecuta tu propia comparación</h3><p class="muted">Desde la carpeta del proyecto, prueba primero el recorrido gratuito:</p><pre><code>./scripts/experiment --policy baseline --seeds 7 --steps 3</code></pre><p class="muted">Para usar IA, configura <code>OPENAI_API_KEY</code> en tu archivo privado <code>.env</code> y ejecuta:</p><pre><code>./scripts/experiment --seeds 7 8 --steps 3 --budget-usd 0.10</code></pre><p class="hint">El límite corresponde a las generaciones de ese experimento. Los informes muestran estimaciones con los tokens del proveedor, separadas del coste de infraestructura.</p></div>
+  </section>
+  <div class="catalog-heading"><div><div class="eyebrow">GUARDADOS EN ESTE EQUIPO</div><h2>Tus experimentos</h2></div><button id="refresh-experiments">Actualizar ↻</button></div>
+  <div id="experiments-status" role="status" class="muted">Cargando experimentos…</div>
+  <section id="experiment-list" class="experiment-list" aria-label="Experimentos guardados"></section>
+  <footer>Los datos se leen del almacenamiento local. Esta pantalla no inicia llamadas a modelos. El agente recibe una vista limitada; el operador conserva acceso al estado completo para auditar resultados.</footer>
+</main><script src="/assets/experiments.js?v=0.2.0"></script>
+</body></html>

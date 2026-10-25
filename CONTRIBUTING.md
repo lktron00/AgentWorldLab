@@ -6,7 +6,7 @@ you ran. Please open an issue before starting a large new world or scheduler.
 Bug reports should include OS/architecture, upstream pins, the failing command,
 and a small synthetic reproducer. Remove credentials and private run data.
 
-The first release deliberately has one social scenario and one authoritative
+The current release deliberately has one social scenario family and one authoritative
 clock. Useful contributions include better experiment protocols, new agent
 policies with recorded provenance, additional scenario packages, and evidence
 about reproducibility and cost. Claims of human realism need independent data.
@@ -32,3 +32,11 @@ environments, API keys, logs or personal experiments.
 
 By submitting a contribution you agree to license it under Apache-2.0, the
 project's license. Be respectful, specific and constructive in discussions.
+
+
+For report/cost changes, test missing and malformed usage, interrupted writes,
+recorded-price reconciliation and untrusted text escaping. Rebuild the bundled
+example with `python3 scripts/build-example-report.py` and check it with
+`--check`. Its source is sanitized recorded data under `examples/recorded-demo`;
+do not relabel it as a fresh provider run or replace usage with invented receipts.
+Native experiments and the default CI must remain free of paid API calls.
