@@ -1,43 +1,56 @@
-# Launch acceptance and evidence
+# 0.2 launch acceptance
 
-Objective: make Agent World Lab usable by other people as an open-source project and publish a verified release. A working local demo alone does not complete this objective.
+Target: an experimental open-source laboratory that another developer can
+install, run locally and use to compare an external AI policy with a visible-feed
+baseline, while preserving reproducibility and honest cost accounting.
 
-## Required before announcing the release
+The public announcement is planned for the next user session. Prepare the
+release and its assets as a **draft**; do not publish it during preparation.
 
-- [x] Fresh installation from the published source, with pinned upstream revisions and no dependence on the author's filesystem.
-- [x] macOS ARM and Linux runtime verification of AgentSociety 2, OASIS and OpenEnv; document any unsupported platform accurately.
-- [x] Reliable reset, step, recovery, checkpoints, replay and export, including failure and concurrency tests.
-- [x] Agent policies and scenarios that users can extend; a documented path for real external AI agents, with honest separation from the scripted baseline.
-- [x] Working dashboard, API documentation and runnable examples, including resuming a saved experiment.
-- [x] Default local exposure protected against cross-origin browser access; no credentials, private logs or run data published.
-- [x] License, third-party notices, contribution instructions, security reporting, release notes and public automated checks.
-- Publication gate: the tagged release must point to a passing CI commit and
-  include a downloadable source archive and checksum. Verify its links without
-  authentication before announcing it. Publication status is recorded on the
-  [GitHub releases page](https://github.com/lktron00/AgentWorldLab/releases).
+## Acceptance gates
 
-## Current authoritative starting point
+- [ ] Real AgentSociety 2 scheduling/clock, OASIS state and OpenEnv transport;
+  pinned dependencies remain isolated. Failure, recovery and concurrency checks
+  pass on the final source revision.
+- [ ] Agent-only observations and permissions hold across reset, step, state
+  and alternate protocol paths. Operator configuration and full data require a
+  separate capability. Invalid actions do not advance the clock.
+- [ ] Paired experiments restore the same checkpoint world and clock. Offline
+  baseline self-check compares complete trajectories and requires no key or
+  model calls. Configuration errors are actionable and fail before spending.
+- [ ] The optional model policy preserves prompts, public decisions, usage,
+  recorded prices and per-experiment costs. Budget and unresolved-call handling
+  fail closed. The real-provider execution is auditable from saved artifacts.
+- [ ] A read-only post-crash audit reconstructs known costs from the durable
+  journal, flags incomplete/ambiguous calls, and never starts models or workers.
+- [ ] A standalone readable report shows paired outcomes, trajectories,
+  decisions and costs. The local dashboard can discover saved experiments.
+  Report content is escaped; no credentials enter reports or release assets.
+- [ ] Fresh source-archive installation and the documented commands work on
+  macOS ARM64 and Linux x86_64/ARM64 as claimed. The final Docker image runs as
+  non-root, with loopback-only host publication, and supports an offline
+  experiment with networking disabled after installation.
+- [ ] README, extension guide, security policy, version metadata, release notes,
+  known limitations and contribution path describe the final behavior. Browser
+  checks cover the dashboard and experiment report at desktop/mobile sizes.
+- [ ] Final commit has passing public CI. A reproducible source archive and
+  checksum are attached to a draft 0.2 release, with the target commit recorded.
+  The source tree and assets contain no secrets, environments or private runs.
+- [ ] Launch copy and a final requirement-by-requirement evidence record are
+  ready for the user. Publishing the draft remains the final launch action.
 
-- Initial prototype commit: `7e3c0fc`.
-- Main checkout and release worktree (`codex/launch`): use `git worktree list` to locate them.
-- Existing prototype validation: 14 tests on macOS ARM, including the three real engines. This does not establish Linux support or readiness for public exposure.
-- GitHub CLI authenticated as `lktron00`; repository `lktron00/AgentWorldLab` did not exist at the initial launch audit.
-- Docker daemon available on Linux ARM64; independent Linux validation is possible locally.
+## Scope and limits
 
-Update this file with concrete evidence as gates are satisfied. Keep unfinished requirements explicit; do not relabel missing work as completed.
+This is a developer/research alpha, with a social-diffusion scenario and one
+externally controlled account in each world. Background policies are explicit
+scripted rules. No human predictive validity, general model superiority,
+training-ready reward, hostile-code sandbox, public multi-tenant service,
+Windows-native support or arbitrary upstream-version compatibility is claimed.
+Old 0.1 checkpoints require 0.1 code. The default baseline remains offline.
 
-## Release preparation evidence
+## Evidence
 
-- macOS ARM64: 51 tests passed, including real engines, failure recovery and
-  concurrent session/checkpoint tests. See VALIDATION.md.
-- Dashboard: created a world, saved step 2, compared five-step branches;
-  the rendered results were 20 vs 10 unverified sharers. Screenshot in
-  `docs/dashboard.png` contains synthetic experiment data only.
-- `examples/compare.py` completed seeds 7 and 8 via the live API, producing
-  endpoint counts 20/10 and 20/14 and a paired mean difference of 8.
-- Public repository created at https://github.com/lktron00/AgentWorldLab;
-  anonymous GitHub API access confirms `private: false`. Private vulnerability
-  reporting is enabled. Anonymous source cloning also succeeded.
-- Linux x86_64: 51 tests passed in public CI from a fresh checkout. Linux ARM64:
-  51 tests passed in a non-root container with networking disabled. Exact
-  evidence and platform limits are recorded in VALIDATION.md.
+Initial state for this readiness pass: feature commit `f2b1586`, PR #1, 76 passing
+Linux tests and a real six-call experiment whose provider-reported token cost
+estimate is US$0.0004773. These establish the starting point, not completion of
+new readiness gates. Final evidence belongs in `docs/release-readiness.md`.

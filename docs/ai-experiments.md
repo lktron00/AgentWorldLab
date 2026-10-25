@@ -24,7 +24,7 @@ This is an API credential, independent of the model selected in Codex.
 
 No existing server is required. This command creates a new directory under
 `data/experiments/`, starts its own server on a random loopback port, runs both
-branches, writes the results and stops that server. It does not interrupt the
+branches, writes the JSON/Markdown/HTML results and stops that server. Reports are also discoverable at `/experiments` in the local dashboard. It does not interrupt the
 dashboard on port 8765. `--output data/experiments/my-run` chooses a NEW output
 directory. Existing directories are rejected to prevent silent cost-journal
 overwrites and accidental mixing of runs.
@@ -40,7 +40,7 @@ experimental steps per branch. For another recorded price-book model:
 
 Use `--policy baseline --seeds 7 --steps 3` for an offline end-to-end self-check.
 Both branches then use the SAME deterministic policy. It makes no model calls,
-should produce identical trajectories and is clearly labeled
+requires identical full-world hashes at every step and is clearly labeled
 `offline-baseline-self-check`. It is not evidence of a real AI run.
 
 ## What the agent observes and may do
@@ -104,7 +104,8 @@ fallback to scripted decisions and no automatic retry after a failed call.
 
 ## Cost accounting and failure behavior
 
-`report.md` is the readable summary; `report.json` includes trajectories, run and
+`report.html` is the standalone visual report, with trajectories, costs,
+decisions and the agent's limited observations. `report.md` is the text summary; `report.json` includes trajectories, run and
 checkpoint IDs, world fingerprints, per-branch/per-seed costs and the paired
 mean differences. `signal_sharers` tracks only accounts sharing the original
 scenario signal (root post 1), excluding account 0. `external_signal_reposts`
@@ -146,3 +147,36 @@ OpenAI reference sources:
 - [Responses input-token counting and usage](https://developers.openai.com/api/reference/python/resources/responses)
 - [GPT-6 Luna standard rates](https://developers.openai.com/api/docs/models/gpt-6-luna)
 - [GPT-6.1 Sol standard rates](https://developers.openai.com/api/docs/models/gpt-6.1-sol)
+
+
+## Audit or rebuild a report after interruption
+
+```sh
+./scripts/report data/experiments/YOUR_EXPERIMENT --check
+./scripts/report data/experiments/YOUR_EXPERIMENT
+```
+
+The first command is read-only. The second writes derivative `report.html` and
+`audit.json`; it does not overwrite the source report, decisions or cost journal.
+Neither command starts a worker or contacts a model. A response saved before its
+`charged` event can supply a recovered receipt at the **recorded** prices. A
+reservation with no verifiable response remains unresolved. A truncated tail is
+flagged and contradictory complete events fail closed. An unfinished source
+report is labeled unfinished; the auditor does not infer whether its process
+is still running. Check the process before starting another experiment.
+
+The local catalog hides stale cost estimates when the journal is newer than its
+saved summary. Opening the report performs an offline audit. Read-only JSON is
+at `/lab/experiments/{name}/report.json`. Content is escaped, and the HTML page
+does not execute model-supplied markup. The default dashboard is a trusted
+operator interface; agent capabilities do not grant these endpoints.
+
+## Explore an evidence-bearing scenario
+
+`scenarios/evidence.json` includes an explicitly invented test record in the
+visible text. Pass it with `--scenario scenarios/evidence.json` to compare
+decisions under a different information condition. The operator annotation is
+still hidden from the agent; textual evidence is not independently verified.
+This changes scenario inputs, not the world mechanics or the model's tools.
+Every new report records the application version, policy/wrapper source hashes
+and upstream revisions in addition to native engine provenance.

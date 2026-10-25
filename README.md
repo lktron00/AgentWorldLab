@@ -2,17 +2,25 @@
 
 [![Real engine integration](https://github.com/lktron00/AgentWorldLab/actions/workflows/ci.yml/badge.svg)](https://github.com/lktron00/AgentWorldLab/actions/workflows/ci.yml)
 
-An open-source laboratory for reproducible multi-agent experiments. The first prototype connects **AgentSociety 2 + OASIS + OpenEnv** through real runtime integrations.
+An open-source laboratory for testing external AI policies in reproducible
+multi-agent social worlds. Compare a policy with a visible-feed baseline from
+the same checkpoint, then inspect decisions, trajectories, token usage and
+estimated model costs.
 
-Create a community, introduce a signal, watch it spread, checkpoint the world, and compare two policies from exactly the same starting state. A local dashboard and a typed Python client use the same OpenEnv WebSocket API.
+**AgentSociety 2** schedules the agents and owns the simulation clock. **OASIS**
+owns social state. **OpenEnv** provides the external agent interface. These are
+real, pinned runtimes connected through small adapters.
 
-![A real run in the local dashboard, comparing open diffusion and friction](docs/dashboard.png)
+![The local laboratory](docs/dashboard.png)
 
-**Status:** functional local prototype. The included agents follow explicit scripted policies. This is an integration and experimentation foundation, not a validated predictor of human behavior, an LLM benchmark, or a production service.
+**Status: experimental 0.2.** The default dashboard and baseline run offline.
+Optional OpenAI experiments use a separately configured key and explicit
+budget. Background agents follow scripted rules; the project does not claim
+to predict people or provide a validated intelligence benchmark.
 
 ## Quick start
 
-Requires Git and [uv](https://docs.astral.sh/uv/getting-started/installation/). Supported installation targets are macOS ARM64 and Linux ARM64/x86_64; see [VALIDATION.md](VALIDATION.md) for completed platform checks. Bootstrap downloads Python 3.11/3.12, pinned upstream source and dependencies, including CPU PyTorch. Allow several GB of disk space. No API key or model download is needed to run the included experiment.
+Requires Git and [uv](https://docs.astral.sh/uv/getting-started/installation/). Supported installation targets are macOS ARM64 and Linux ARM64/x86_64; see [VALIDATION.md](VALIDATION.md) for completed platform checks. Bootstrap downloads Python 3.11/3.12, pinned upstream source and dependencies, including CPU PyTorch. Allow several GB of disk space. No API key or model download is needed to run the baseline and dashboard. A fresh install requires several GB of storage and network access to fetch dependencies; experiments then run offline unless the optional model policy is selected.
 
 ```sh
 git clone https://github.com/lktron00/AgentWorldLab.git
@@ -33,7 +41,7 @@ preserve experiments). Docker Desktop needs enough memory for Python and Ray;
 8 GB allocated to Docker is a starting recommendation, not a measured minimum.
 To select another host port: `WORLDLAB_PORT=8768 docker compose up --build`.
 
-Open **http://127.0.0.1:8765**. The first world may take 30–90 seconds to start Ray and import upstream modules. Later ticks are much faster.
+Open **http://127.0.0.1:8765** for the laboratory, or **http://127.0.0.1:8765/experiments** for saved reports and a recorded real-run example. The first world may take 30–90 seconds to start Ray and import upstream modules. Later ticks are much faster.
 
 1. Click **Crear mundo** with seed 7 and 20 agents.
 2. Advance two steps, then **Guardar checkpoint**.
@@ -63,7 +71,7 @@ The one-command runner now connects an external OpenAI policy through a
 server-enforced, agent-scoped view and compares it with a deterministic
 visible-feed baseline from the exact same checkpoint. Both branches use the
 same background policy. Per-decision tokens, estimated USD cost, decisions and
-paired trajectories are saved. The normal demo remains offline.
+paired trajectories are saved. The normal demo remains offline. No existing server is required for the command.
 
 ```sh
 # Set OPENAI_API_KEY in a private, gitignored .env first.
@@ -72,7 +80,24 @@ paired trajectories are saved. The normal demo remains offline.
 ./scripts/experiment --policy baseline --seeds 7 --steps 3
 ```
 
-The runner starts/stops its own loopback server. See
+Each run writes `report.html`, `report.json`, `decisions.jsonl` and a durable
+`costs.jsonl`. Open the HTML directly or find it in the local experiment
+catalog. The offline self-check requires complete world trajectories to match.
+To audit/rebuild an existing report without an engine or model call:
+
+```sh
+./scripts/report data/experiments/YOUR_EXPERIMENT
+./scripts/report data/experiments/YOUR_EXPERIMENT --check
+```
+
+![A recorded external-policy experiment and its cost audit](docs/report.png)
+
+The bundled example is a sanitized recording, not a new inference. Its six
+real GPT-6 Luna calls used an estimated **US$0.0004773** at the recorded rates;
+this is one tiny synthetic run, not a general price/performance promise.
+
+The runner starts/stops its own loopback server. `WORLDLAB_DATA` selects the
+shared data directory for the dashboard and default experiment output. See
 [AI experiments, observation permissions and cost accounting](docs/ai-experiments.md).
 
 ## External agent API
@@ -192,11 +217,16 @@ python3 scripts/doctor.py
 
 Integration tests start a local TCP server, connect the real `EnvClient`, schedule real Ray tasks, and inspect real OASIS SQLite rows. They verify state continuity, identical continuation, policy divergence, external actions, rejection without clock advancement, replay/export and recovery in a fresh process. Initial imports make the first test slower.
 
-## Next increments
+## What to contribute next
 
 - Multiple external agents in one shared world, with an explicit simultaneous-action contract.
 - Scenario packages beyond social diffusion; benchmark against observed data before claiming realism.
 - Scalable shared worker infrastructure and additional platform coverage.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and
+[release readiness](docs/release-readiness.md) for contribution boundaries,
+security assumptions and the final release evidence. The recorded demo can be
+rebuilt offline with `python3 scripts/build-example-report.py`.
 
 The native server binds to loopback; Docker Compose publishes only on the host's loopback interface. HTTP and WebSocket requests enforce local Host and same-origin browser access. There is no authentication or tenant isolation. Keep it local; public hosting requires additional work. Local checkpoints contain data and trusted code provenance, and are not an untrusted artifact import format. See [SECURITY.md](SECURITY.md).
 

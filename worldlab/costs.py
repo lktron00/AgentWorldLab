@@ -38,8 +38,8 @@ def token_count(value):
     return value
 
 
-def usage_cost(model, usage):
-    rates = PRICE_BOOK["models"][model]
+def usage_cost(model, usage, price_book=None):
+    rates = (price_book or PRICE_BOOK)["models"][model]
     incoming = token_count(usage["input_tokens"])
     outgoing = token_count(usage["output_tokens"])
     details = usage.get("input_tokens_details") or {}
@@ -93,6 +93,8 @@ class CostLedger:
         return call_id
 
     def received(self, call_id, model, response, latency_ms):
+        if call_id not in self.pending:
+            raise ValueError("Cannot charge a call without a pending reservation")
         # Preserve the response and usage BEFORE parsing an action: invalid decisions still cost money.
         self.append({"event": "response", "call_id": call_id, "response": response, "latency_ms": latency_ms})
         usage = response.get("usage")

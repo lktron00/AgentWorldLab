@@ -1,5 +1,6 @@
 """Dedicated local OpenEnv server with scoped agent and operator capabilities."""
 import os
+import json
 import secrets
 import threading
 import time
@@ -13,6 +14,7 @@ from .models import LabAction, LabObservation, LabState
 from .security import LocalAccessMiddleware
 from .server import checkpoint, export, frames, list_runs, run_path
 from .common import read_json
+from . import __version__
 
 
 RESET_TICKETS = {}
@@ -58,6 +60,27 @@ class CapabilityMiddleware:
         agent = secrets.compare_digest(bearer, ("Bearer " + self.agent_token).encode())
         allowed = operator or (agent and path == "/ws" and scope["type"] == "websocket")
         if allowed:
+            if scope["type"] == "websocket" and path == "/ws":
+                async def simulation_only_receive():
+                    while True:
+                        event = await receive()
+                        if event["type"] != "websocket.receive":
+                            return event
+                        raw = event.get("text")
+                        message = None
+                        if isinstance(raw, str) and len(raw.encode()) <= 16 * 1024:
+                            try:
+                                message = json.loads(raw)
+                            except ValueError:
+                                pass
+                        if isinstance(message, dict) and message.get("type") in {"reset", "step", "state", "close"}:
+                            return event
+                        # OpenEnv also supports MCP tunneled inside /ws. The
+                        # scoped endpoint deliberately accepts simulation only.
+                        await send({"type": "websocket.send", "text": json.dumps({
+                            "type": "error", "data": {"code": "unsupported_protocol",
+                            "message": "Only reset, step, state and close text messages up to 16 KiB are accepted"}})})
+                return await self.app(scope, simulation_only_receive, send)
             return await self.app(scope, receive, send)
         if scope["type"] == "websocket":
             await send({"type": "websocket.close", "code": 1008})
@@ -68,8 +91,12 @@ class CapabilityMiddleware:
 
 
 def build_app(operator_token, agent_token):
+    if (not isinstance(operator_token, str) or not isinstance(agent_token, str)
+            or not operator_token or not agent_token or operator_token == agent_token):
+        raise ValueError("Distinct operator and agent tokens must be configured before startup")
     app = create_app(AgentEnvironment, LabAction, LabObservation,
                      env_name="agent_world_lab_scoped", max_concurrent_envs=1, state_cls=LabState)
+    app.version = __version__
     app.add_middleware(CapabilityMiddleware, operator_token=operator_token, agent_token=agent_token)
     app.add_middleware(LocalAccessMiddleware)
     app.add_api_route("/lab/runs", list_runs, methods=["GET"])

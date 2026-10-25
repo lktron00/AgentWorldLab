@@ -29,6 +29,8 @@ jobs:
           cache-dependency-glob: |
             requirements/*.txt
             upstreams.json
+      - name: Verify reproducible recorded report
+        run: python3 scripts/build-example-report.py --check
       - name: Native libraries
         run: sudo apt-get update && sudo apt-get install -y build-essential libmagic1 libcairo2 libgomp1
       - name: Install immutable upstreams and isolated runtimes
@@ -37,6 +39,10 @@ jobs:
         run: python3 scripts/doctor.py
       - name: Contracts, failures, isolation and three real engines
         run: ./scripts/test -q --basetemp=test-results
+      - name: Offline CLI experiment and journal audit
+        run: |
+          ./scripts/experiment --policy baseline --seeds 7 --population 4 --warmup 1 --steps 2 --output test-results/offline-cli
+          ./scripts/report test-results/offline-cli --check
       - name: Diagnostics on failure
         if: failure()
         run: |

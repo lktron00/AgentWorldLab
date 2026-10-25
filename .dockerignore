@@ -8,3 +8,10 @@ __pycache__
 test-results
 .env*
 *.pyc
+
+dist
+
+**/.env*
+**/.venv*
+**/__pycache__
+**/*.pyc

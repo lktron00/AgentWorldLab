@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import secrets
+import signal
 import socket
 import statistics
 import subprocess
@@ -21,9 +22,11 @@ import httpx
 
 from .ai_policy import OpenAIPolicy, VisibleFeedBaseline
 from .client import LabClient
-from .common import ROOT, write_json
+from .common import DATA, ROOT, read_json, write_json
+from . import __version__
 from .costs import BudgetExceeded, CostLedger, PRICE_BOOK, amount, usd
 from .models import LabAction
+from .errors import safe_error
 from .scenarios import validate_scenario
 
 
@@ -79,7 +82,7 @@ def save_report(output, report, ledger):
               "A model is not guaranteed to reproduce its decisions. Scripted diffusion is not a human prediction.",
               "", "Artifacts: `report.json`, `decisions.jsonl`, `costs.jsonl`, `engine/runs/`, `engine/checkpoints/`."]
     if report.get("error"):
-        lines += ["", f"Stopped: {report['error']}"]
+        lines += ["", f"Stopped: {report['error'].get('message', report['error'].get('type')) if isinstance(report['error'], dict) else report['error']}"]
     (output / "report.md").write_text("\n".join(lines) + "\n")
 
 
@@ -123,7 +126,7 @@ def experiment_server(output):
 
 
 async def run_paired(args, url, operator_token, agent_token, candidate, ledger, report):
-    async with LabClient(base_url=url, message_timeout_s=180,
+    async with LabClient(base_url=url, message_timeout_s=180, mode="simulation",
                          headers={"Authorization": "Bearer " + agent_token}) as client, \
             httpx.AsyncClient(base_url=url, timeout=180, trust_env=False,
                               headers={"Authorization": "Bearer " + operator_token}) as operator:
@@ -155,6 +158,7 @@ async def run_paired(args, url, operator_token, agent_token, candidate, ledger, 
                     raise RuntimeError("Branches did not start from the exact checkpoint world")
                 branch = {"run_id": observation["run_id"], "initial_world_sha256": world_fingerprint(full),
                           "status": "running", "trajectory": [operator_metrics(full)],
+                          "world_sha256": [world_fingerprint(full)],
                           "estimated_cost_usd": usd(0)}
                 row["branches"][name] = branch
                 before = ledger.spent
@@ -175,6 +179,7 @@ async def run_paired(args, url, operator_token, agent_token, candidate, ledger, 
                             "event": "applied", "decision_id": decision_id, "resulting_step": observation["step"]})
                         full = await snapshot(observation["run_id"])
                         branch["trajectory"].append(operator_metrics(full))
+                        branch["world_sha256"].append(world_fingerprint(full))
                         branch["estimated_cost_usd"] = usd(ledger.spent - before)
                         save_report(args.output, report, ledger)
                         print(f"seed={seed} branch={name} step={index + 1}/{args.steps} cost_usd={branch['estimated_cost_usd']}", flush=True)
@@ -182,6 +187,8 @@ async def run_paired(args, url, operator_token, agent_token, candidate, ledger, 
                 finally:
                     branch["estimated_cost_usd"] = usd(ledger.spent - before)
                     save_report(args.output, report, ledger)
+            if report["mode"] == "offline-baseline-self-check":
+                verify_self_check(row)
             row["candidate_minus_baseline"] = {
                 key: row["branches"]["candidate"]["trajectory"][-1][key] - row["branches"]["baseline"]["trajectory"][-1][key]
                 for key in COMPARISON_METRICS}
@@ -191,6 +198,13 @@ async def run_paired(args, url, operator_token, agent_token, candidate, ledger, 
         for key in COMPARISON_METRICS}}
     report["status"] = "completed"
     save_report(args.output, report, ledger)
+
+
+def verify_self_check(pair):
+    left, right = pair["branches"]["baseline"], pair["branches"]["candidate"]
+    if left["world_sha256"] != right["world_sha256"] or left["trajectory"] != right["trajectory"]:
+        raise RuntimeError("Offline self-check diverged: complete world trajectories must match")
+    pair["full_trajectory_match"] = True
 
 
 def parser():
@@ -212,14 +226,19 @@ def parser():
 
 
 def main(argv=None):
-    args = parser().parse_args(argv)
-    scenario = validate_scenario(json.loads(args.scenario.read_text()) if args.scenario else None)
-    if not (0 <= args.warmup and 1 <= args.steps and args.warmup + args.steps <= scenario["max_steps"]):
-        raise ValueError("warmup + steps must fit inside scenario.max_steps")
-    if not 4 <= args.population <= 100 or not 128 <= args.max_output_tokens <= 4096:
-        raise ValueError("Population must be 4–100 and max output tokens 128–4096")
-    if any(not 0 <= seed <= 2**32 - 1 for seed in args.seeds) or len(set(args.seeds)) != len(args.seeds):
-        raise ValueError("Use distinct seeds from 0 to 2^32-1")
+    argument_parser = parser()
+    args = argument_parser.parse_args(argv)
+    try:
+        scenario = validate_scenario(json.loads(args.scenario.read_text()) if args.scenario else None)
+        if not (0 <= args.warmup and 1 <= args.steps and args.warmup + args.steps <= scenario["max_steps"]):
+            raise ValueError("warmup + steps must fit inside scenario.max_steps")
+        if not 4 <= args.population <= 100 or not 128 <= args.max_output_tokens <= 4096:
+            raise ValueError("Population must be 4–100 and max output tokens 128–4096")
+        if any(not 0 <= seed <= 2**32 - 1 for seed in args.seeds) or len(set(args.seeds)) != len(args.seeds):
+            raise ValueError("Use distinct seeds from 0 to 2^32-1")
+        amount(args.budget_usd)
+    except (ValueError, ArithmeticError, OSError) as exc:
+        argument_parser.error(str(exc) if not isinstance(exc, ArithmeticError) else "Budget must be a finite nonnegative USD amount")
     # The API key stays in the external process. Never send it to the simulation workers.
     api_key = None
     if args.policy == "openai":
@@ -228,12 +247,17 @@ def main(argv=None):
         if not api_key:
             print("Missing OPENAI_API_KEY. Set it in the environment or .env; no model call was made.", file=sys.stderr)
             return 2
-    from .costs import amount
-    amount(args.budget_usd)  # Validate before creating an output directory.
-    args.output = (args.output or ROOT / "data" / "experiments" / uuid.uuid4().hex).resolve()
-    args.output.mkdir(parents=True, exist_ok=False)
+    args.output = (args.output or DATA / "experiments" / uuid.uuid4().hex).resolve()
+    try:
+        args.output.mkdir(parents=True, exist_ok=False)
+    except OSError as exc:
+        argument_parser.error(safe_error(exc)["message"])
     ledger = CostLedger(args.output / "costs.jsonl", args.budget_usd)
     report = {"schema_version": 1, "status": "running",
+              "application": {"name": "Agent World Lab", "version": __version__,
+                              "source_sha256": {name: hashlib.sha256((ROOT / "worldlab" / name).read_bytes()).hexdigest()
+                                                for name in ("experiment.py", "ai_policy.py", "costs.py", "observations.py", "agent_server.py", "models.py")},
+                              "upstreams": read_json(ROOT / "upstreams.json")},
               "started_at": datetime.now(timezone.utc).isoformat(),
               "mode": "real-openai" if args.policy == "openai" else "offline-baseline-self-check",
               "candidate": {"provider": args.policy, "model": args.model if api_key else None,
@@ -253,21 +277,35 @@ def main(argv=None):
         else:
             await run_paired(args, url, operator, agent, VisibleFeedBaseline(), ledger, report)
 
+    previous_term = signal.getsignal(signal.SIGTERM)
+    def interrupt(signum, frame):
+        raise KeyboardInterrupt()
+    signal.signal(signal.SIGTERM, interrupt)
     try:
         with experiment_server(args.output) as (url, operator, agent):
             asyncio.run(execute(url, operator, agent))
     except BaseException as exc:
         report["status"] = "budget_exhausted" if isinstance(exc, BudgetExceeded) else "interrupted" if isinstance(exc, KeyboardInterrupt) else "failed"
-        report["error"] = type(exc).__name__
+        report["error"] = safe_error(exc)
         for row in report["experiments"]:
             for branch in row["branches"].values():
                 if branch["status"] == "running":
                     branch["status"] = report["status"]
-        print(f"Experiment stopped: {type(exc).__name__}. Results and costs are preserved.", file=sys.stderr)
+        print(report["error"]["message"], file=sys.stderr)
     finally:
+        signal.signal(signal.SIGTERM, previous_term)
         report["finished_at"] = datetime.now(timezone.utc).isoformat()
         save_report(args.output, report, ledger)
-        print(f"Report: {args.output / 'report.md'}\nEstimated model cost: US${usd(ledger.spent)}; unresolved calls: {len(ledger.pending)}", flush=True)
+        from .reports import write_html_report
+        try:
+            write_html_report(args.output)
+        except (OSError, ValueError, TypeError, KeyError, ArithmeticError) as exc:
+            report["render_error"] = type(exc).__name__
+            if report["status"] == "completed":
+                report["status"] = "report_failed"
+            save_report(args.output, report, ledger)
+            print("HTML report could not be rendered. Source results and cost journal remain saved; run scripts/report for an offline audit.", file=sys.stderr)
+        print(f"Report: {args.output / 'report.html'}\nEstimated model cost: US${usd(ledger.spent)}; unresolved calls: {len(ledger.pending)}", flush=True)
     return 0 if report["status"] == "completed" else 1
 
 

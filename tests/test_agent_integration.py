@@ -81,6 +81,9 @@ def test_paired_runner_restores_exact_world_and_saves_decisions_and_zero_cost(sc
     baseline, candidate = row["branches"]["baseline"], row["branches"]["candidate"]
     assert baseline["initial_world_sha256"] == candidate["initial_world_sha256"] == row["initial_world_sha256"]
     assert baseline["trajectory"] == candidate["trajectory"]
+    assert baseline["world_sha256"] == candidate["world_sha256"]
+    assert len(baseline["world_sha256"]) == 3
+    assert row["full_trajectory_match"] is True
     assert row["candidate_minus_baseline"] == {"signal_sharers": 0, "external_signal_reposts": 0, "unverified_sharers": 0, "external_reposts": 0, "external_unverified_posts": 0}
     events = [json.loads(line) for line in (tmp_path / "decisions.jsonl").read_text().splitlines()]
     assert len([e for e in events if e["event"] == "decision"]) == 4

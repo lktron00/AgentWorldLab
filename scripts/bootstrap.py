@@ -53,6 +53,9 @@ def main():
         revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=source, text=True).strip()
         dirty = subprocess.check_output(["git", "status", "--porcelain"], cwd=source, text=True).strip()
         if revision != spec["commit"] or dirty:
+            print(f"Expected source revision: {spec['commit']}; found: {revision}", flush=True)
+            if dirty:
+                print("Changed upstream paths (no contents):\n" + dirty, flush=True)
             raise SystemExit(f"{source} differs from its pinned revision. Preserve your edits before reinstalling.")
         run(uv, "python", "install", spec["python"])
         environment = ROOT / spec["environment"]

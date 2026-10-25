@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — external AI experiments (prepared release)
 
 - Server-enforced external-agent observations and visible-post action guards;
   separate local agent/operator capabilities in a dedicated OpenEnv server.
@@ -9,6 +9,12 @@
 - Durable per-call usage/cost journal, total budget reservation, cache/ reasoning
   accounting and readable experiment reports. Ambiguous API failures stop further
   spending and remain unresolved rather than being counted as free.
+- Offline audit reconstructs costs from durable responses after interruption,
+  flags ambiguous/truncated usage and preserves source artifacts.
+- Standalone HTML reports, local experiment catalog, sanitized recorded demo
+  and an evidence-bearing synthetic scenario.
+- Actionable CLI errors, graceful SIGTERM handling and full-trajectory hashes
+  in the offline self-check. Reports include application/source provenance.
 - External account now follows accounts 1 and 2. This adapter change invalidates
   v0.1.0 checkpoints; keep that release to restore earlier experiments.
 
