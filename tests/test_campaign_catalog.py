@@ -36,3 +36,19 @@ def test_campaign_catalog_preserves_text_and_blocks_path_and_symlink_escapes(tmp
         (path/'report.json').symlink_to(other)
         assert client.get('/campaigns/test-case').status_code==409
         assert client.get('/lab/campaigns').json()==[]
+
+
+def test_operator_application_exposes_campaign_and_recorded_example():
+    from worldlab.server import app
+    # Exercise the actual application wiring, not only the isolated router.
+    with TestClient(app, base_url='http://127.0.0.1') as client:
+        page = client.get('/campaigns')
+        assert page.status_code == 200 and '/assets/nubenorte-report.html' in page.text
+        assert client.get('/lab/campaigns').status_code == 200
+        example = client.get('/assets/nubenorte-report.html')
+        assert example.status_code == 200 and '__CAMPAIGN_DATA__' not in example.text
+        receipt = client.get('/lab/examples/nubenorte/report.json')
+        assert receipt.status_code == 200 and 'attachment' in receipt.headers['content-disposition']
+        data = receipt.json()
+        assert data['recording'] and data['summary']['pairs'] == 1000
+        assert data['summary']['worlds'] == 2000 and data['summary']['model_calls'] == 0

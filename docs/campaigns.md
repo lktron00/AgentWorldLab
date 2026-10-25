@@ -130,3 +130,7 @@ complete journal. The fixture and checks are in
 The full native suite passed 111 tests in 383.45 seconds while the large
 campaign was running. An additional real SIGTERM/resume test passed in 79.45
 seconds. CI collects that additional test as part of the complete suite.
+
+An additional application-entrypoint check exercises `/campaigns`, the recorded
+HTML and the JSON attachment through the actual operator app; the catalog
+checks passed 2 tests in 2.06 seconds.
