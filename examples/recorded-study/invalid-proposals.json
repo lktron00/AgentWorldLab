@@ -1,0 +1,77 @@
+[
+  {
+    "event": "invalid_proposal",
+    "seed": 100067,
+    "branch": "diagnostic",
+    "actor": 5,
+    "step": 9,
+    "case_id": "billing-double",
+    "attempt": 0,
+    "error_type": "ValueError",
+    "note": "Completed usage recorded; resample the same scoped observation, never a scripted fallback.",
+    "model": "gpt-6-luna",
+    "usage": {
+      "input_tokens": 1927,
+      "input_tokens_details": {
+        "cache_write_tokens": 1795,
+        "cached_tokens": 0
+      },
+      "output_tokens": 95,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 2022
+    },
+    "estimated_cost_usd": "0.0002850750"
+  },
+  {
+    "event": "invalid_proposal",
+    "seed": 100067,
+    "branch": "diagnostic",
+    "actor": 5,
+    "step": 9,
+    "case_id": "billing-double",
+    "attempt": 1,
+    "error_type": "ValueError",
+    "note": "Completed usage recorded; resample the same scoped observation, never a scripted fallback.",
+    "model": "gpt-6-luna",
+    "usage": {
+      "input_tokens": 1927,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 1795
+      },
+      "output_tokens": 87,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 2014
+    },
+    "estimated_cost_usd": "0.0000746500"
+  },
+  {
+    "event": "invalid_proposal",
+    "seed": 100067,
+    "branch": "diagnostic",
+    "actor": 5,
+    "step": 9,
+    "case_id": "billing-double",
+    "attempt": 2,
+    "error_type": "ValueError",
+    "note": "Completed usage recorded; resample the same scoped observation, never a scripted fallback.",
+    "model": "gpt-6-luna",
+    "usage": {
+      "input_tokens": 1927,
+      "input_tokens_details": {
+        "cache_write_tokens": 0,
+        "cached_tokens": 1795
+      },
+      "output_tokens": 91,
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "total_tokens": 2018
+    },
+    "estimated_cost_usd": "0.0000766500"
+  }
+]

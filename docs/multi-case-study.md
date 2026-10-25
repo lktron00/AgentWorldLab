@@ -91,3 +91,9 @@ The supervisor starts in its own OS session with redirected streams and no termi
 The native catalog checks writer liveness instead of trusting a stale running flag. It shows recovery or required reconciliation when a writer disappears. Complete JSONL/SQLite exports wait until the job stops; the scoped decision viewer stays available throughout. At successful closure, `audit.json`, `completion.json` and `results.md` record the final outcomes, confirmed cost and maximum possible cost. The page labels confirmed cost explicitly.
 
 For this local execution a finite macOS idle-sleep assertion follows the supervisor PID; it expires with that process and does not change permanent settings. A thread heartbeat named “Completar simulación AgentWorldLab” checks progress quietly, verifies final artifacts, reports completion or a concrete blocker. It was removed after verified completion; the chat and dashboard remain open.
+
+## Public recorded dataset
+
+The [public recording](../examples/recorded-study/README.md) includes all 41,770 valid decisions in a compressed JSONL archive, all 102 complete paired trajectories, the four incomplete pairs, three paid invalid proposals, 17 full unknown reservations, prices and recorded audit summary. The standalone viewer shows the first completed pair per case, not a result-selected sample. The preceding pilot has its own complete 4,000-decision archive.
+
+`python3 scripts/build-study-example.py --check` uses only the Python standard library. It verifies archive integrity, observation hashes, all complete-world action counts and final probabilities/Brier scores, aggregates, known token costs and cumulative reserved bounds. This public check does not reproduce the original engine/database audit; raw provider payloads, provider IDs, local paths and engine databases remain excluded. Read each package's scope before treating its recorded audit as independently replayed evidence.

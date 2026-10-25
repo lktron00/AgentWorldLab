@@ -5,7 +5,7 @@
   "status_at_snapshot": "running",
   "source_commit": "84fa0b16f8d752cfaf91514b63bfd283b8d6e2ce",
   "dashboard": "http://127.0.0.1:8765/studies/nine-cases-10usd",
-  "dataset_path": "/Users/dan/Documents/Codebase/AgentWorldLab/data/studies/nine-cases-10usd",
+  "dataset_path": "data/studies/nine-cases-10usd",
   "budget_total_usd": "10.0000000000",
   "progress_snapshot": {
     "completed_pairs": 26,

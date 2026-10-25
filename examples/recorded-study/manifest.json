@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "scope": "Public package integrity, not the complete private execution audit",
+  "artifacts": {
+    "examples/recorded-pilot/decisions.jsonl.gz": {
+      "bytes": 1752474,
+      "sha256": "124fd68e5375df99a0ce472cab45250306262ca0ea6e5088cadbdb72a0656f4b"
+    },
+    "examples/recorded-pilot/execution-audit.json": {
+      "bytes": 1178,
+      "sha256": "090bdf69683b880d4103b26f763011701000a1eb52b3e0d17df8cfb2dc58624e"
+    },
+    "examples/recorded-pilot/report.json": {
+      "bytes": 3935,
+      "sha256": "f300f84b70e07d470a442a788c20fa27366954563f7cbab02ba348ebb2403d4a"
+    },
+    "examples/recorded-study/RESULTS.md": {
+      "bytes": 5201,
+      "sha256": "71ade84407b982dd7c2ecef6417ee6158dfad2fef7632b7e294bc3a2c321ecf7"
+    },
+    "examples/recorded-study/comparisons.json": {
+      "bytes": 514701,
+      "sha256": "6aafb99e5d7d67641013f6d71c99152d9e344f463492df6160ce31fd420126a0"
+    },
+    "examples/recorded-study/decisions.jsonl.gz": {
+      "bytes": 13655070,
+      "sha256": "24d2fa205c2f0ebc67bf1f4c643c4fad19ef8d176c85671c5dfab087c2a1c749"
+    },
+    "examples/recorded-study/execution-audit.json": {
+      "bytes": 1188,
+      "sha256": "7ca357e8866a9f9d3aec51e36c96014b7c187d5c3d4b909d8cb455d97054887d"
+    },
+    "examples/recorded-study/index.html": {
+      "bytes": 1651809,
+      "sha256": "6d08b8405d8045d81ae557e2a9890347686c959da0be41e33c4d4e82a76e8631"
+    },
+    "examples/recorded-study/invalid-proposals.json": {
+      "bytes": 1977,
+      "sha256": "f05fba218b4360fe61885037f3d58e26c0cb363a002f291d8e77ae1d206bc20e"
+    },
+    "examples/recorded-study/price-book.json": {
+      "bytes": 596,
+      "sha256": "1e6664ab9c65a32b7f83ea75270f146fb42ed2100c86cb299b4a936993f7b4e9"
+    },
+    "examples/recorded-study/report.json": {
+      "bytes": 42767,
+      "sha256": "fcbf84787cd08be3f45dbc7d72b26383cb052d663691050e895c2c1c126b5a56"
+    },
+    "examples/recorded-study/sample-decisions.jsonl.gz": {
+      "bytes": 1221763,
+      "sha256": "3bab9d70cfa351b806fe0449dc2d640f800588f978ae5b3ae8b32748f163f8f0"
+    },
+    "examples/recorded-study/unreceipted-requests.json": {
+      "bytes": 2765,
+      "sha256": "264c147b87fd3dc44695e7d87749d270cda9f9230c6c190c4e9281935f197c27"
+    }
+  }
+}

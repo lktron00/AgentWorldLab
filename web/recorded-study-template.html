@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-__SCRIPT_HASH__'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Nueve casos con agentes IA · Agent World Lab</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#182b36;background:#f0f5f7;line-height:1.55}*{box-sizing:border-box}body{margin:0}header{background:#182b36;color:white;padding:18px 5%;display:flex;justify-content:space-between;gap:20px}header a{color:white}main{max-width:1160px;margin:auto;padding:42px 28px 65px}h1{font-size:clamp(30px,4.4vw,50px);line-height:1.1;letter-spacing:-1.5px;max-width:900px}h2{line-height:1.2;margin:0 0 16px}.eyebrow{color:#126e78;text-transform:uppercase;font-size:12px;font-weight:bold;letter-spacing:1.5px}.lead{font-size:18px;max-width:880px}.hint{font-size:13px;color:#536573}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin:30px 0}.stat,section{background:white;border:1px solid #d9e2e7;border-radius:14px;padding:22px}.stat strong{display:block;font-size:29px;margin:8px 0}.stat span{font-size:13px;color:#536573}section{margin-top:25px}a{color:#126e78}button,select{font:inherit;padding:10px 12px;border:1px solid #c0cdd4;border-radius:7px;background:white;color:#182b36}button{cursor:pointer}button:hover{background:#eaf3f4}label{display:grid;gap:6px;font-size:13px;font-weight:bold}.filters{display:grid;grid-template-columns:2.2fr 1.3fr 1fr 1fr;gap:12px;margin:25px 0 12px}.table-scroll{overflow:auto}table{width:100%;border-collapse:collapse;font-size:14px;min-width:740px}th,td{text-align:left;padding:13px 10px;border-bottom:1px solid #e1e9ed}th{font-size:11px;color:#536573;text-transform:uppercase}td:nth-child(n+3),th:nth-child(n+3){text-align:right}tr:hover td{background:#f6f9fa}.cards{display:grid;grid-template-columns:1fr 1fr;gap:15px}.decision{border:1px solid #d9e2e7;border-radius:9px;padding:19px}.decision h3{margin:0 0 6px}.decision p{margin:10px 0}details{margin-top:12px}summary{cursor:pointer;font-weight:bold;font-size:14px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7f8;padding:14px;border-radius:8px;font-size:12px;max-height:400px;overflow:auto}.tag{font-size:11px;font-weight:bold;color:#126e78;text-transform:uppercase;letter-spacing:1px}.budget{font-size:15px}.links{display:flex;gap:18px;flex-wrap:wrap}footer{font-size:13px;color:#536573;margin-top:25px}.error{color:#a12626}#content[hidden]{display:none}@media(max-width:740px){.stats{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}main{padding:28px 16px}section{padding:18px}.stat strong{font-size:24px}}
+</style></head><body>
+<header><strong>AGENT WORLD LAB</strong><a href="https://github.com/lktron00/AgentWorldLab">Repositorio del proyecto ↗</a></header>
+<main><div class="eyebrow">Grabación real · nueve casos sintéticos · sin nuevas llamadas</div>
+<h1>¿La información adicional ayuda a los agentes o los confunde?</h1>
+<p class="lead">20 agentes Luna por mundo decidieron qué consultar, publicar, compartir o esperar. Comparamos un estado genérico con un documento consultable desde el minuto 2. El documento podía ser útil, incompleto o antiguo.</p>
+<p class="hint">Este archivo funciona sin servidor ni clave API en un navegador moderno. Abrirlo solo lee resultados guardados; no inicia simulaciones.</p>
+<p id="loading" role="status">Abriendo la grabación…</p>
+<div id="content" hidden>
+<div class="stats" id="stats"></div>
+<section><div class="eyebrow">Todos los resultados completos</div><h2>Nueve casos y 102 comparaciones</h2>
+<p>Las probabilidades son juicios finales de los modelos sobre la existencia del problema, no riesgos medidos de una empresa real. Un menor Brier significa menor error frente al estado conocido del escenario.</p>
+<div class="table-scroll"><table><thead><tr><th>Caso</th><th>Estado del escenario</th><th>Pares</th><th>Genérico %</th><th>Documento %</th><th>Δ Brier</th><th>Menor error</th></tr></thead><tbody id="cases"></tbody></table></div>
+<p class="hint">Un delta negativo favorece la condición con documento. Solo se agregan pares completos. Son resultados descriptivos de un modelo en escenarios sintéticos; no validan comportamiento humano.</p></section>
+<section><div class="eyebrow">3.600 decisiones de muestra</div><h2>Ver qué decidió cada agente y qué información recibió</h2>
+<p>El visor incluye la primera repetición completa de cada caso, seleccionada de forma determinista por su semilla, sin ordenar por el resultado. El archivo completo publicado contiene las 41.770 decisiones válidas, incluidas las 50 propuestas sin aplicar.</p>
+<div class="filters"><label>Caso<select id="case"></select></label><label>Condición<select id="branch"><option value="generic">Estado genérico</option><option value="diagnostic">Documento consultable</option></select></label><label>Turno<select id="step"></select></label><label>Cuenta<select id="actor"><option value="all">Todas</option></select></label></div>
+<p id="selection" class="hint"></p><div id="decisions" class="cards" aria-live="polite"></div></section>
+<section><div class="eyebrow">Contabilidad del estudio</div><h2>El presupuesto acumulado fue de US$10</h2><div id="budget" class="budget"></div>
+<p class="hint">Los importes se calculan con tokens y tarifas registradas. No son una factura final y no incluyen impuestos, infraestructura ni créditos de desarrollo. Las reservas sin recibo no se presentan como cargos confirmados.</p>
+<details><summary>Qué se publica y qué verifica este ejemplo</summary><p>Se publican todas las decisiones válidas del estudio y del piloto, las 102 comparaciones completas, los intentos inválidos pagados, las 17 reservas sin recibo y el resumen de la auditoría original. El verificador público recalcula observaciones, acciones, estadísticas y costos desde estos archivos.</p><p>Los identificadores privados del proveedor y las rutas locales se omiten. Las bases de los motores y los payloads originales del proveedor no se incluyen; el paquete público no permite repetir toda la auditoría original de motores. Las 41.770 decisiones no son réplicas independientes: los agentes de un mismo mundo interactúan.</p></details>
+<div class="links"><button id="download">Descargar resumen JSON</button><a href="https://github.com/lktron00/AgentWorldLab/tree/main/examples/recorded-study">Dataset completo e instrucciones ↗</a><a href="https://github.com/lktron00/AgentWorldLab/tree/main/docs/presentacion">Presentación del proyecto ↗</a></div></section>
+<footer>Estudio cerrado el 25 de octubre de 2026. El entorno inicial, los roles y los datos privados se mantuvieron iguales dentro de cada par. No se impuso una reducción de reenvíos. El modelo eligió dentro de las acciones permitidas. El costo de volver a ejecutar un experimento puede variar.</footer>
+</div></main>
+<script id="viewer">
+'use strict';
+const PACKED='__PACKED_RECORDING__';
+const $=id=>document.getElementById(id);
+const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
+const number=n=>Number(n).toLocaleString('es-CL');
+const percent=n=>Number(n).toLocaleString('es-CL',{minimumFractionDigits:1,maximumFractionDigits:1});
+async function main(){
+ const bytes=Uint8Array.from(atob(PACKED),c=>c.charCodeAt(0));
+ const archive=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).json();
+ const r=archive.report;
+ for(const [label,value,note] of [['Decisiones válidas',number(r.progress.decisions),'41.720 aplicadas'],['Pares completos',number(r.progress.completed_pairs),'9 de 9 casos'],['Costo confirmado','US$'+Number(r.cost.total_confirmed_usd).toFixed(6),'Incluye el piloto anterior'],['Máximo con reservas','US$'+Number(r.cost.total_maximum_exposure_usd).toFixed(6),'17 solicitudes sin recibo']]){
+  const n=el('div',undefined,'stat');n.append(el('span',label),el('strong',value),el('span',note));$('stats').append(n);
+ }
+ for(const s of r.summary){
+  const c=r.cases.find(x=>x.id===s.case_id);const tr=el('tr');
+  for(const text of [s.title,c.truth?'Problema real':'Falsa alarma',s.pairs,percent(s.by_branch.generic.mean_probability),percent(s.by_branch.diagnostic.mean_probability),s.mean_paired_brier_difference.toFixed(6),`${s.diagnosis_better} de ${s.pairs}`])tr.append(el('td',text));
+  $('cases').append(tr);const op=el('option',s.title);op.value=s.case_id;$('case').append(op);
+ }
+ for(let i=0;i<10;i++){const op=el('option','Turno '+(i+1));op.value=String(i);$('step').append(op);}
+ for(let i=1;i<=20;i++){const op=el('option','Cuenta '+i);op.value=String(i);$('actor').append(op);}
+ const labels={wait:'Esperar',post:'Publicar',repost:'Compartir',inspect_status:'Consultar página pública',inspect_record:'Consultar registro privado'};
+ function render(){
+  const cid=$('case').value,branch=$('branch').value,step=Number($('step').value),actor=$('actor').value;
+  const seed=r.selected_pair_seeds[cid];
+  const rows=archive.decisions.filter(d=>d.case_id===cid&&d.branch===branch&&d.step===step&&(actor==='all'||d.actor===Number(actor)));
+  $('selection').textContent=`Semilla ${seed} · primera repetición completa de este caso · ${rows.length} ${rows.length===1?'decisión mostrada':'decisiones mostradas'}`;
+  $('decisions').replaceChildren();
+  for(const d of rows){
+   const card=el('article',undefined,'decision');card.append(el('span',labels[d.action.kind]||d.action.kind,'tag'),el('h3','Cuenta '+String(d.actor).padStart(2,'0')));
+   card.append(el('p',d.reason),el('p',`Probabilidad declarada: ${d.belief_problem}% · ${d.applied?'Aplicada':'Propuesta sin aplicar'}`));
+   if(d.action.content)card.append(el('p','Mensaje: '+d.action.content));
+   if(d.action.kind==='repost'&&d.action.post_id!=null)card.append(el('p','Publicación compartida: '+d.action.post_id));
+   const details=el('details');details.append(el('summary','Ver exactamente qué información recibió'),el('pre',JSON.stringify(d.observation,null,2)));card.append(details);
+   const usage=el('p',`${number(d.usage.input_tokens)} tokens de entrada · ${number(d.usage.output_tokens)} de salida · US$${d.estimated_cost_usd}`,'hint');card.append(usage);$('decisions').append(card);
+  }
+ }
+ for(const id of ['case','branch','step','actor'])$(id).addEventListener('change',render);
+ for(const text of [`Estudio nuevo confirmado: US$${r.cost.additional.estimated_cost_usd}. Piloto anterior incluido: US$${r.cost.previous_pilot_usd}.`,`Acumulado confirmado: US$${r.cost.total_confirmed_usd}. Reservas completas sin recibo: US$${r.cost.additional.quarantined_reserved_usd}. Máximo acumulado: US$${r.cost.total_maximum_exposure_usd}.`,`Cuatro pares incompletos están conservados y excluidos de la comparación. Tres propuestas inválidas pagadas permanecen contabilizadas.`])$('budget').append(el('p',text));
+ const design=el('details');design.append(el('summary','Ver las instrucciones comunes que recibió el modelo'),el('pre',r.instructions));$('budget').append(design);
+ $('download').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(r,null,2)],{type:'application/json'}));const a=el('a');a.href=url;a.download='agent-world-lab-recorded-study.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+ render();$('loading').textContent='Grabación cargada. No se realizaron llamadas a modelos.';$('content').hidden=false;
+}
+main().catch(()=>{$('loading').textContent='No se pudo abrir la grabación. Usa un navegador compatible con DecompressionStream o consulta los archivos JSON publicados.';$('loading').className='error';});
+</script></body></html>

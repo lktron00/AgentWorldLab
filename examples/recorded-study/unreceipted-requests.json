@@ -1,0 +1,138 @@
+[
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 6,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011651250"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 9,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011513750"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 14,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011501250"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 5,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011687500"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 17,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011497500"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 2,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011703750"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 12,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011482500"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 8,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011592500"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 1,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011640000"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 3,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011820000"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 7,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011676250"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 10,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011570000"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 11,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011592500"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 13,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011493750"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 15,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011581250"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 20,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011487500"
+  },
+  {
+    "seed": 100032,
+    "branch": "diagnostic",
+    "step": 2,
+    "actor": 4,
+    "case_id": "billing-small-sample",
+    "reserved_usd": "0.0011710000"
+  }
+]

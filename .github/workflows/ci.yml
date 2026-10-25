@@ -33,6 +33,7 @@ jobs:
         run: |
           python3 scripts/build-example-report.py --check
           python3 scripts/build-campaign-example.py --check
+          python3 scripts/build-study-example.py --check
       - name: Native libraries
         run: sudo apt-get update && sudo apt-get install -y build-essential libmagic1 libcairo2 libgomp1
       - name: Install immutable upstreams and isolated runtimes

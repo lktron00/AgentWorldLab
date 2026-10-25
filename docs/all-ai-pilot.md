@@ -68,3 +68,6 @@ Provider-reported usage was 6,162,516 input tokens and 270,852 output tokens (in
 No account reposted the initial message in either condition. The diagnosis did not reduce total reposts in this run. It changed the models' declared estimates, with a mean paired difference of −10.565 percentage points; all ten paired differences were negative. These results describe this model, these roles and this fixture. They do not establish effects on people or calibrated loss probabilities.
 
 The compact [validation recording](pilot-validation.json) preserves every pair's costs and final metrics, full aggregate results, token accounting, artifact hashes and the independent auditor's source hash. The execution source snapshot was captured at run start; the independent auditor was subsequently strengthened and records its own implementation hash. Full local observations, provider responses and engine data are retained in `data/pilots/nubenorte-luna-20x10/`. No additional model calls are needed to inspect or re-audit them.
+
+
+The [public pilot recording](../examples/recorded-pilot/README.md) now includes all 4,000 valid decisions with their original scoped observations and reported token usage, plus the paired summary and recorded audit. Provider IDs and local paths are omitted. Exploring the recording makes no paid calls.

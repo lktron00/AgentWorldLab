@@ -2,21 +2,40 @@
 
 [![Real engine integration](https://github.com/lktron00/AgentWorldLab/actions/workflows/ci.yml/badge.svg)](https://github.com/lktron00/AgentWorldLab/actions/workflows/ci.yml)
 
-An open-source laboratory for testing external AI policies in reproducible
-multi-agent social worlds. Compare a policy with a visible-feed baseline from
-the same checkpoint, then inspect decisions, trajectories, token usage and
-estimated model costs.
+An open-source laboratory for testing AI decisions in reproducible multi-agent
+social worlds. Compare conditions from the same checkpoint, inspect what each
+agent could observe, and trace decisions, trajectories and model costs.
+Recorded examples are available without a model key or engine installation.
 
 **AgentSociety 2** schedules the agents and owns the simulation clock. **OASIS**
 owns social state. **OpenEnv** provides the external agent interface. These are
 real, pinned runtimes connected through small adapters.
 
-![The local laboratory](docs/dashboard.png)
+![The completed nine-case all-AI study recording](docs/recorded-study.png)
 
 **Status: experimental 0.2.** The default dashboard and baseline run offline.
 Optional OpenAI experiments use a separately configured key and explicit
-budget. Background agents follow scripted rules; the project does not claim
-to predict people or provide a validated intelligence benchmark.
+budget. The default background agents follow scripted rules. Optional all-AI
+studies let every active account choose through a model. The project does not
+claim to predict people or provide a validated intelligence benchmark.
+The current main branch includes development after the v0.2.0 release.
+
+## Explore the completed work without paying for models
+
+- **[Project presentation in Spanish](docs/presentacion/README.md)** — a seven-page introduction for nontechnical readers, in PDF and editable Word, with diagrams and real results.
+- **[Nine-case all-AI study](examples/recorded-study/README.md)** — 102 complete paired comparisons, all 41,770 valid decisions and 3,600 browsable decisions from the first complete pair of each case.
+- **[First all-AI pilot](examples/recorded-pilot/README.md)** — all 4,000 recorded Luna decisions across ten pairs, including a result with no change in initial-rumor sharing.
+- **[1,000-pair scripted campaign](examples/recorded-campaign/README.md)** — 800,000 programmed decisions with zero model API calls. Its reduction in sharing follows an explicitly imposed rule.
+
+Open [`web/recorded-study.html`](web/recorded-study.html) after downloading the repository. This self-contained recording needs a modern browser, no server, no API key and no new model calls. After starting the local dashboard, `/campaigns` also links to it.
+
+The nine-case study's **confirmed cumulative usage was US$9.9792478750**, including the earlier pilot. Seventeen unreceipted requests retain their full US$0.0197201250 reservation; **maximum cumulative exposure was US$9.9989680000** under the original US$10 cap. This ceiling is not an exact invoice. Synthetic results describe model behavior, not validated human predictions.
+
+Validate the published data and rebuild the recording checks with the Python standard library:
+
+```sh
+python3 scripts/build-study-example.py --check
+```
 
 ## Quick start
 
