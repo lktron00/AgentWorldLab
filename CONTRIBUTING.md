@@ -40,3 +40,10 @@ example with `python3 scripts/build-example-report.py` and check it with
 `--check`. Its source is sanitized recorded data under `examples/recorded-demo`;
 do not relabel it as a fresh provider run or replace usage with invented receipts.
 Native experiments and the default CI must remain free of paid API calls.
+
+
+## Recorded all-AI datasets
+
+The portable study and pilot recordings include all 45,770 valid decisions as compressed JSONL and a self-contained browser viewer. Run `python3 scripts/build-study-example.py --check` before changing their data or template. The check requires only the Python standard library and never calls a model.
+
+The viewer template is `web/recorded-study-template.html`. Regenerating the public export requires the completed private source datasets; do not fabricate a recording or create another paid run to repair an example. See `examples/recorded-study/README.md` for the public verifier's exact scope. Provider IDs, private paths and API keys must not enter a published recording.

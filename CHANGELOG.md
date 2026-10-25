@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — recorded multi-agent studies
+
+- Scripted Nube Norte campaign with 1,000 paired comparisons and an offline explainer.
+- All-AI 20-account Luna pilot and a nine-case study under one cumulative US$10 cap, with scoped observations and complete-pair comparisons.
+- Durable resumption, independent detached supervision and full reserved bounds for requests without usage receipts; no unknown request replay.
+- Independent final audit, inspectable decisions and final cost/completion artifacts.
+- Public compressed archives of all 45,770 valid AI decisions across pilot and study, all 102 study comparisons, a self-contained offline viewer and package verification.
+- Nontechnical project presentation in PDF and editable Word, plus its source.
+
 ## 0.2.0 — external AI experiments (experimental)
 
 - Server-enforced external-agent observations and visible-post action guards;

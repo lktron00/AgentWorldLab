@@ -1,0 +1,18 @@
+{
+  "title": "Nube Norte: un rumor de pérdida de archivos",
+  "question": "¿Cuántas cuentas llegan a compartir el rumor durante sus primeros ocho minutos?",
+  "context": "Nube Norte es una plataforma ficticia de almacenamiento. Una cuenta publica que perdió archivos. No hay una conclusión técnica: el mensaje se trata como no verificado. Cada mundo contiene cuentas automáticas conectadas por una red de seguimiento, más una cuenta externa que permanece inactiva.",
+  "population": 50,
+  "steps": 8,
+  "world": {
+    "max_steps": 8,
+    "initial_content": "CASO SINTÉTICO — Nube Norte: no encuentro mis carpetas desde esta mañana. ¿Se perdieron los archivos? Voy a avisar al resto. Mensaje sin verificar; plataforma y situación ficticias.",
+    "initial_verified": false,
+    "friction_multiplier": 0.2,
+    "feed_limit": 12
+  },
+  "policies": {
+    "open": {"label": "Reenvío habitual", "description": "Cada cuenta que encuentra el rumor en su feed tiene una probabilidad programada de reenviarlo de entre 60% y 90% por minuto."},
+    "friction": {"label": "Pausa antes de reenviar", "description": "Desde el primer mensaje, la probabilidad de reenviar contenido sin verificar se multiplica por 0,2: queda entre 12% y 18% por minuto. Es una regla impuesta, no una comprobación de hechos ni una respuesta de IA."}
+  }
+}

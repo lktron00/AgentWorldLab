@@ -59,15 +59,22 @@ class BudgetExceeded(RuntimeError):
 
 
 class CostLedger:
-    def __init__(self, path: Path, budget):
+    def __init__(self, path: Path, budget, *, max_in_flight=1):
         self.path, self.budget = path, amount(budget)
+        if type(max_in_flight) is not int or not 1 <= max_in_flight <= 20:
+            raise ValueError("max_in_flight must be 1–20")
+        self.max_in_flight = max_in_flight
+        self.uncertain_calls = set()
         self.spent = Decimal(0)
         self.pending = {}
+        self.held = {}
         self.receipts = []
+        self.contexts = {}
         if path.exists():
             raise ValueError("Use a new experiment directory; an existing cost ledger is never overwritten")
         path.parent.mkdir(parents=True, exist_ok=True)
         self.append({"event": "ledger", "budget_usd": usd(self.budget), "price_book": PRICE_BOOK,
+                     "max_in_flight": max_in_flight,
                      "basis": "Provider-reported usage × recorded rates; excludes infrastructure, tax and Codex credits"})
 
     def append(self, event):
@@ -77,23 +84,24 @@ class CostLedger:
             os.fsync(stream.fileno())
 
     def reserve(self, model, input_tokens, max_output_tokens, context):
-        if self.pending:
-            raise RuntimeError("An unresolved API call prevents further spending")
+        if self.uncertain_calls or len(self.pending) >= self.max_in_flight:
+            raise RuntimeError("An unresolved API call or the in-flight limit prevents further spending")
         if not 0 < token_count(input_tokens) <= 32_000:
             raise ValueError("This runner permits 1–32000 counted input tokens per call")
         rates = PRICE_BOOK["models"][model]
         maximum = (input_tokens * max(amount(rates["input"]), amount(rates["cache_write"]))
                    + token_count(max_output_tokens) * amount(rates["output"])) / 1_000_000
-        if self.spent + maximum > self.budget:
+        if self.spent + sum(self.pending.values(), Decimal(0)) + sum(self.held.values(), Decimal(0)) + maximum > self.budget:
             raise BudgetExceeded("Remaining budget cannot cover this call's reserved maximum")
         call_id = uuid.uuid4().hex
         self.append({"event": "reserved", "call_id": call_id, "model": model,
                      "input_tokens_counted": input_tokens, "reserved_usd": usd(maximum), **context})
         self.pending[call_id] = maximum
+        self.contexts[call_id] = dict(context)
         return call_id
 
     def received(self, call_id, model, response, latency_ms):
-        if call_id not in self.pending:
+        if call_id not in self.pending and call_id not in self.held:
             raise ValueError("Cannot charge a call without a pending reservation")
         # Preserve the response and usage BEFORE parsing an action: invalid decisions still cost money.
         self.append({"event": "response", "call_id": call_id, "response": response, "latency_ms": latency_ms})
@@ -107,23 +115,41 @@ class CostLedger:
                    "usage": usage, "estimated_cost_usd": usd(cost), "latency_ms": latency_ms}
         self.append({"event": "charged", **receipt})
         self.spent += cost
-        self.pending.pop(call_id)
+        self.pending.pop(call_id, None)
+        self.held.pop(call_id, None)
+        self.uncertain_calls.discard(call_id)
         self.receipts.append(receipt)
         if self.spent > self.budget:
             raise BudgetExceeded("Reported usage exceeded the budget; experiment stopped")
         return receipt
 
     def uncertain(self, call_id, error_type):
+        self.uncertain_calls.add(call_id)
         self.append({"event": "unresolved", "call_id": call_id, "error_type": error_type,
                      "note": "No usage receipt; call may have been billed. No retry or zero-cost claim."})
 
+    def quarantine(self, call_id, reason):
+        """Retain an unknown request's entire bound without treating it as billed or free."""
+        if call_id not in self.pending or call_id not in self.uncertain_calls:
+            raise ValueError('Only a stopped, uncertain request may be quarantined')
+        maximum = self.pending[call_id]
+        self.append({'event': 'quarantined', 'call_id': call_id, 'reserved_usd': usd(maximum),
+                     'reason': reason, 'note': 'No usage receipt. Full reservation retained; request never replayed.'})
+        self.held[call_id] = self.pending.pop(call_id)
+        self.uncertain_calls.remove(call_id)
+
     def summary(self):
-        return {"currency": "USD", "estimated_cost_usd": usd(self.spent),
+        unknown = {**self.held, **self.pending}
+        result = {"currency": "USD", "estimated_cost_usd": usd(self.spent),
                 "budget_usd": usd(self.budget), "completed_calls": len(self.receipts),
-                "unresolved_calls": len(self.pending),
-                "unresolved_reserved_usd": usd(sum(self.pending.values(), Decimal(0))),
-                "accounting": "estimated_from_reported_usage" if not self.pending else "incomplete_usage",
+                "unresolved_calls": len(unknown),
+                "unresolved_reserved_usd": usd(sum(unknown.values(), Decimal(0))),
+                "accounting": "estimated_from_reported_usage" if not unknown else "incomplete_usage",
                 "input_tokens": sum(r["usage"]["input_tokens"] for r in self.receipts),
                 "output_tokens": sum(r["usage"]["output_tokens"] for r in self.receipts),
                 "reasoning_tokens": sum((r["usage"].get("output_tokens_details") or {}).get("reasoning_tokens", 0)
                                         for r in self.receipts)}
+
+        if self.held:
+            result.update(quarantined_calls=len(self.held), quarantined_reserved_usd=usd(sum(self.held.values(), Decimal(0))))
+        return result

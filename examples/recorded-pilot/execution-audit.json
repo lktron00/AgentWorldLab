@@ -1,0 +1,36 @@
+{
+  "verified": true,
+  "basis": "Offline reconstruction; no API calls",
+  "scope": {
+    "pairs": 10,
+    "worlds": 20,
+    "active_accounts_per_world": 20,
+    "model_decisions": 4000,
+    "applied_actions": 4000,
+    "engine_frames": 220,
+    "distinct_provider_responses": 4000
+  },
+  "cost": {
+    "currency": "USD",
+    "estimated_cost_usd": "0.8736880250",
+    "budget_usd": "10.0000000000",
+    "completed_calls": 4000,
+    "unresolved_calls": 0,
+    "unresolved_reserved_usd": "0.0000000000",
+    "accounting": "estimated_from_reported_usage",
+    "input_tokens": 6162516,
+    "output_tokens": 270852,
+    "reasoning_tokens": 170
+  },
+  "peak_committed_plus_reserved_usd": "0.8801498000",
+  "auditor_sha256": "9249efb45b55df517296368fc78fb4073669ee24e7dc1d94e7f9930a4b8a0d56",
+  "checks": [
+    "one Luna receipt per account per turn",
+    "shared budget including concurrent reservations",
+    "every observation reconstructed without global state",
+    "prompts and decisions match original provider requests/responses",
+    "identical paired initial worlds",
+    "every engine action equals its model proposal",
+    "OASIS databases and complete frame hashes"
+  ]
+}

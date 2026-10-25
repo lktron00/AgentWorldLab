@@ -1,0 +1,37 @@
+{
+  "verified": true,
+  "usage_complete": false,
+  "budget_bounds_verified": true,
+  "unreceipted_requests": 17,
+  "maximum_exposure_usd": "9.9989680000",
+  "basis": "Offline reconstruction; no model calls; unknown usage retains its full bound",
+  "model": "gpt-6-luna",
+  "scope": {
+    "complete_pairs": 102,
+    "valid_decisions": 41770,
+    "applied_decisions": 41720,
+    "unapplied_proposals": 50,
+    "invalid_paid_proposals": 3,
+    "distinct_provider_responses": 41773,
+    "engine_frames": 2296,
+    "oasis_databases": 210
+  },
+  "cost": {
+    "currency": "USD",
+    "estimated_cost_usd": "9.1055598500",
+    "budget_usd": "9.1263119750",
+    "completed_calls": 41773,
+    "unresolved_calls": 17,
+    "unresolved_reserved_usd": "0.0197201250",
+    "accounting": "incomplete_usage",
+    "input_tokens": 59255017,
+    "output_tokens": 4169139,
+    "reasoning_tokens": 10717,
+    "quarantined_calls": 17,
+    "quarantined_reserved_usd": "0.0197201250"
+  },
+  "previous_pilot_usd": "0.8736880250",
+  "total_confirmed_usd": "9.9792478750",
+  "peak_confirmed_plus_reserved_usd": "9.9999775500",
+  "auditor_sha256": "6e491a909704103669c5f8609d20fdf2777583ccb591c9c648058570fe8422fe"
+}

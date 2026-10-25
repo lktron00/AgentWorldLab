@@ -7,6 +7,7 @@ DEFAULTS = {
     "initial_verified": False,
     "friction_multiplier": 0.2,
     "feed_limit": 12,
+    "decision_mode": "scripted",
 }
 
 
@@ -27,4 +28,6 @@ def validate_scenario(value=None):
     multiplier = result["friction_multiplier"]
     if type(multiplier) not in (int, float) or not math.isfinite(multiplier) or not 0 <= multiplier <= 1:
         raise ValueError("friction_multiplier must be a number between 0 and 1")
+    if result["decision_mode"] not in ("scripted", "submitted"):
+        raise ValueError("decision_mode must be scripted or submitted")
     return result
