@@ -1,0 +1,89 @@
+{
+  "verified_at": "2026-10-25T17:27:13.246401+00:00",
+  "status": "completed",
+  "dataset": "data/studies/nine-cases-10usd",
+  "runtime_source_commit": "75ffd98",
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "population": 20,
+  "steps": 10,
+  "progress": {
+    "completed_pairs": 102,
+    "decisions": 41770,
+    "applied_decisions": 41720,
+    "model_calls": 41773,
+    "cases_with_completed_pairs": 9
+  },
+  "audit": {
+    "verified": true,
+    "usage_complete": false,
+    "budget_bounds_verified": true,
+    "unreceipted_requests": 17,
+    "maximum_exposure_usd": "9.9989680000",
+    "basis": "Offline reconstruction; no model calls; unknown usage retains its full bound",
+    "model": "gpt-6-luna",
+    "scope": {
+      "complete_pairs": 102,
+      "valid_decisions": 41770,
+      "applied_decisions": 41720,
+      "unapplied_proposals": 50,
+      "invalid_paid_proposals": 3,
+      "distinct_provider_responses": 41773,
+      "engine_frames": 2296,
+      "oasis_databases": 210
+    },
+    "cost": {
+      "currency": "USD",
+      "estimated_cost_usd": "9.1055598500",
+      "budget_usd": "9.1263119750",
+      "completed_calls": 41773,
+      "unresolved_calls": 17,
+      "unresolved_reserved_usd": "0.0197201250",
+      "accounting": "incomplete_usage",
+      "input_tokens": 59255017,
+      "output_tokens": 4169139,
+      "reasoning_tokens": 10717,
+      "quarantined_calls": 17,
+      "quarantined_reserved_usd": "0.0197201250"
+    },
+    "previous_pilot_usd": "0.8736880250",
+    "total_confirmed_usd": "9.9792478750",
+    "peak_confirmed_plus_reserved_usd": "9.9999775500",
+    "auditor_sha256": "6e491a909704103669c5f8609d20fdf2777583ccb591c9c648058570fe8422fe"
+  },
+  "checks": {
+    "independent_full_audit_matches": true,
+    "aggregate_reconstruction_from_sqlite": true,
+    "sqlite_integrity_check": "ok",
+    "report_completion_cost_and_summary_match": true,
+    "runtime_source_snapshot_matches": true,
+    "original_ledger_prefix_unchanged": true,
+    "incomplete_pairs_excluded": 4,
+    "native_server_health": 200,
+    "final_artifact_downloads_match_local": true,
+    "decision_viewer_verified": true,
+    "supervisor_worker_and_sleep_guard_exited": true,
+    "automation_deleted": "completar-simulaci-n-agentworldlab"
+  },
+  "artifacts": {
+    "report.json": {
+      "bytes": 4155064,
+      "sha256": "3bbfe7da6dc33cc99286f084e5420f26ed76c609853a2903632d61b2551d0a15"
+    },
+    "audit.json": {
+      "bytes": 1188,
+      "sha256": "7ca357e8866a9f9d3aec51e36c96014b7c187d5c3d4b909d8cb455d97054887d"
+    },
+    "completion.json": {
+      "bytes": 9719,
+      "sha256": "47523aa581c1bbf9cb09e122fd2849cc5feba0608fce4ee1061556d4c19bb686"
+    },
+    "results.md": {
+      "bytes": 5118,
+      "sha256": "c3181c7519cb043234c0b1da7fa3108f6b560ab400207ef9f1766e6383e61280"
+    }
+  },
+  "dashboard": "http://127.0.0.1:8765/studies/nine-cases-10usd",
+  "screenshot": "docs/study-finished.png",
+  "scope_note": "Synthetic model behavior; unreceipted requests retain their full maximum. Costs exclude taxes, infrastructure and Codex development credits."
+}

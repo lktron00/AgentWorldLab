@@ -75,7 +75,7 @@ The full source suite passed **127 tests** in 359.70 seconds after the recovery 
 
 An offline audit verified the first nine pairs (3,600 model decisions, 18 OASIS worlds and 198 engine frames). After a later input-count timeout, another audit verified 9,379 provider responses and US$2.9288145750 cumulative usage. It identified 19 paid proposals from an uncommitted tick. Those proposals remain inspectable and labeled, and resumption preserves the original budget ledger. The native viewer was checked on that tick: 19 registered proposals, zero applied actions.
 
-These are historical progress checks, not the finished study. The active process continues under the US$10 cumulative cap and writes its final `audit.json` after stopping with fully reconciled usage. Read the current local report for the latest status and totals.
+These are historical progress checks. The study completed on 2026-10-25 with 102 complete pairs and 41,770 valid decisions across all nine cases. An independent final reconstruction matched `audit.json`; `verified=true` and `budget_bounds_verified=true`. Confirmed cumulative usage is US$9.9792478750, including the prior pilot. Seventeen unreceipted requests retain US$0.0197201250 in full reservations, so `usage_complete=false` and maximum cumulative exposure is US$9.9989680000. Four incomplete pairs and 50 unapplied valid proposals remain preserved and excluded from paired outcomes. Final checks and the screenshot are recorded in `docs/study-completion-validation.json` and `docs/study-finished.png`; the local dataset contains `results.md`, `audit.json` and `completion.json`.
 
 
 ## Finite job independent of the chat
@@ -90,4 +90,4 @@ The supervisor starts in its own OS session with redirected streams and no termi
 
 The native catalog checks writer liveness instead of trusting a stale running flag. It shows recovery or required reconciliation when a writer disappears. Complete JSONL/SQLite exports wait until the job stops; the scoped decision viewer stays available throughout. At successful closure, `audit.json`, `completion.json` and `results.md` record the final outcomes, confirmed cost and maximum possible cost. The page labels confirmed cost explicitly.
 
-For this local execution a finite macOS idle-sleep assertion follows the supervisor PID; it expires with that process and does not change permanent settings. A thread heartbeat named “Completar simulación AgentWorldLab” checks progress quietly, verifies final artifacts, reports completion or a concrete blocker and then pauses itself.
+For this local execution a finite macOS idle-sleep assertion follows the supervisor PID; it expires with that process and does not change permanent settings. A thread heartbeat named “Completar simulación AgentWorldLab” checks progress quietly, verifies final artifacts, reports completion or a concrete blocker. It was removed after verified completion; the chat and dashboard remain open.
