@@ -49,3 +49,22 @@ At successful completion, the independent offline auditor reconciles every model
 ```
 
 Artifacts stay in the ignored `data/pilots/` directory. Source snapshots, upstream pins and dependency lock contents are saved with each pilot. Local browsing and auditing never trigger model calls. Keep the service bound to loopback; public hosting still requires authentication and tenant isolation.
+
+## Recorded real run — 2026-10-25
+
+The first completed run used 20 active Luna accounts, 10 turns and 10 paired repetitions. All 4,000 model decisions were applied and independently reconciled against their original provider requests/responses, 220 saved engine frames and 20 final OASIS databases. It took 1,461.568 seconds. The complete native suite passed 121 tests; the strengthened auditor regression also passed after that suite.
+
+Provider-reported usage was 6,162,516 input tokens and 270,852 output tokens (including 170 reasoning tokens). Recorded API usage cost was **US$0.8736880250**, with zero unresolved calls. The maximum of already charged cost plus simultaneous reservations was US$0.8801498000, below the shared US$10 cap.
+
+| Outcome across 10 complete pairs | Generic status | Consultable diagnosis |
+| --- | ---: | ---: |
+| Mean initial-message sharers, including the initial author | 1 | 1 |
+| New posts | 356 | 370 |
+| Reposts of other messages | 161 | 161 |
+| Status consultations | 571 | 583 |
+| Wait decisions | 912 | 886 |
+| Mean final self-reported probability of permanent loss | 15.6% | 5.035% |
+
+No account reposted the initial message in either condition. The diagnosis did not reduce total reposts in this run. It changed the models' declared estimates, with a mean paired difference of −10.565 percentage points; all ten paired differences were negative. These results describe this model, these roles and this fixture. They do not establish effects on people or calibrated loss probabilities.
+
+The compact [validation recording](pilot-validation.json) preserves every pair's costs and final metrics, full aggregate results, token accounting, artifact hashes and the independent auditor's source hash. The execution source snapshot was captured at run start; the independent auditor was subsequently strengthened and records its own implementation hash. Full local observations, provider responses and engine data are retained in `data/pilots/nubenorte-luna-20x10/`. No additional model calls are needed to inspect or re-audit them.

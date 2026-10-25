@@ -1,0 +1,554 @@
+{
+  "kind": "recorded-real-ai-pilot-validation",
+  "recorded_at": "2026-10-25T12:14:12.081399+00:00",
+  "config": {
+    "population": 20,
+    "steps": 10,
+    "start_seed": 3000,
+    "concurrency": 8,
+    "model": "gpt-6-luna",
+    "effort": "low",
+    "max_output_tokens": 2048
+  },
+  "status": "completed",
+  "summary": {
+    "pairs": 10,
+    "by_branch": {
+      "generic": {
+        "mean_rumor_sharers": 1,
+        "mean_belief_loss": 15.6,
+        "status_consultations": 571,
+        "posts": 356,
+        "reposts": 161,
+        "waits": 912
+      },
+      "diagnostic": {
+        "mean_rumor_sharers": 1,
+        "mean_belief_loss": 5.035,
+        "status_consultations": 583,
+        "posts": 370,
+        "reposts": 161,
+        "waits": 886
+      }
+    },
+    "paired_diagnostic_minus_generic": {
+      "rumor_sharers": {
+        "mean": 0,
+        "median": 0.0,
+        "negative": 0,
+        "zero": 10,
+        "positive": 0,
+        "values": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "mean_belief_loss": {
+        "mean": -10.565,
+        "median": -10.35,
+        "negative": 10,
+        "zero": 0,
+        "positive": 0,
+        "values": [
+          -8.100000000000001,
+          -9.45,
+          -14.35,
+          -13.6,
+          -12.65,
+          -8.649999999999999,
+          -11.25,
+          -5.95,
+          -9.45,
+          -12.2
+        ]
+      }
+    }
+  },
+  "audit": {
+    "verified": true,
+    "basis": "Offline reconstruction; no API calls",
+    "scope": {
+      "pairs": 10,
+      "worlds": 20,
+      "active_accounts_per_world": 20,
+      "model_decisions": 4000,
+      "applied_actions": 4000,
+      "engine_frames": 220,
+      "distinct_provider_responses": 4000
+    },
+    "cost": {
+      "currency": "USD",
+      "estimated_cost_usd": "0.8736880250",
+      "budget_usd": "10.0000000000",
+      "completed_calls": 4000,
+      "unresolved_calls": 0,
+      "unresolved_reserved_usd": "0.0000000000",
+      "accounting": "estimated_from_reported_usage",
+      "input_tokens": 6162516,
+      "output_tokens": 270852,
+      "reasoning_tokens": 170
+    },
+    "peak_committed_plus_reserved_usd": "0.8801498000",
+    "auditor_sha256": "9249efb45b55df517296368fc78fb4073669ee24e7dc1d94e7f9930a4b8a0d56",
+    "checks": [
+      "one Luna receipt per account per turn",
+      "shared budget including concurrent reservations",
+      "every observation reconstructed without global state",
+      "prompts and decisions match original provider requests/responses",
+      "identical paired initial worlds",
+      "every engine action equals its model proposal",
+      "OASIS databases and complete frame hashes"
+    ]
+  },
+  "elapsed_seconds": 1461.568,
+  "pairs": [
+    {
+      "seed": 3000,
+      "cost_usd": "0.0880329500",
+      "branches": {
+        "generic": {
+          "cost_usd": "0.0426063500",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 58,
+            "mean_belief_loss": 14.4
+          },
+          "action_counts": {
+            "inspect_status": 57,
+            "post": 35,
+            "wait": 86,
+            "repost": 22
+          }
+        },
+        "diagnostic": {
+          "cost_usd": "0.0454266000",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 51,
+            "mean_belief_loss": 6.3
+          },
+          "action_counts": {
+            "inspect_status": 59,
+            "wait": 91,
+            "post": 34,
+            "repost": 16
+          }
+        }
+      }
+    },
+    {
+      "seed": 3001,
+      "cost_usd": "0.0861462000",
+      "branches": {
+        "diagnostic": {
+          "cost_usd": "0.0455264250",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 55,
+            "mean_belief_loss": 5.05
+          },
+          "action_counts": {
+            "inspect_status": 59,
+            "post": 40,
+            "wait": 87,
+            "repost": 14
+          }
+        },
+        "generic": {
+          "cost_usd": "0.0406197750",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 50,
+            "mean_belief_loss": 14.5
+          },
+          "action_counts": {
+            "inspect_status": 58,
+            "post": 35,
+            "wait": 93,
+            "repost": 14
+          }
+        }
+      }
+    },
+    {
+      "seed": 3002,
+      "cost_usd": "0.0868456000",
+      "branches": {
+        "generic": {
+          "cost_usd": "0.0407621500",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 48,
+            "mean_belief_loss": 18.75
+          },
+          "action_counts": {
+            "inspect_status": 54,
+            "wait": 99,
+            "post": 32,
+            "repost": 15
+          }
+        },
+        "diagnostic": {
+          "cost_usd": "0.0460834500",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 55,
+            "mean_belief_loss": 4.4
+          },
+          "action_counts": {
+            "inspect_status": 59,
+            "wait": 87,
+            "post": 40,
+            "repost": 14
+          }
+        }
+      }
+    },
+    {
+      "seed": 3003,
+      "cost_usd": "0.0884607750",
+      "branches": {
+        "diagnostic": {
+          "cost_usd": "0.0465983750",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 57,
+            "mean_belief_loss": 4.65
+          },
+          "action_counts": {
+            "inspect_status": 56,
+            "wait": 88,
+            "post": 37,
+            "repost": 19
+          }
+        },
+        "generic": {
+          "cost_usd": "0.0418624000",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 53,
+            "mean_belief_loss": 18.25
+          },
+          "action_counts": {
+            "inspect_status": 54,
+            "wait": 94,
+            "post": 29,
+            "repost": 23
+          }
+        }
+      }
+    },
+    {
+      "seed": 3004,
+      "cost_usd": "0.0880649500",
+      "branches": {
+        "generic": {
+          "cost_usd": "0.0427663250",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 52,
+            "mean_belief_loss": 17.75
+          },
+          "action_counts": {
+            "inspect_status": 64,
+            "post": 41,
+            "wait": 85,
+            "repost": 10
+          }
+        },
+        "diagnostic": {
+          "cost_usd": "0.0452986250",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 48,
+            "mean_belief_loss": 5.1
+          },
+          "action_counts": {
+            "inspect_status": 60,
+            "post": 35,
+            "wait": 93,
+            "repost": 12
+          }
+        }
+      }
+    },
+    {
+      "seed": 3005,
+      "cost_usd": "0.0864209000",
+      "branches": {
+        "diagnostic": {
+          "cost_usd": "0.0457394500",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 53,
+            "mean_belief_loss": 5.45
+          },
+          "action_counts": {
+            "inspect_status": 59,
+            "post": 41,
+            "wait": 89,
+            "repost": 11
+          }
+        },
+        "generic": {
+          "cost_usd": "0.0406814500",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 50,
+            "mean_belief_loss": 14.1
+          },
+          "action_counts": {
+            "inspect_status": 48,
+            "post": 31,
+            "wait": 103,
+            "repost": 18
+          }
+        }
+      }
+    },
+    {
+      "seed": 3006,
+      "cost_usd": "0.0849050250",
+      "branches": {
+        "generic": {
+          "cost_usd": "0.0413137000",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 52,
+            "mean_belief_loss": 15.85
+          },
+          "action_counts": {
+            "inspect_status": 65,
+            "wait": 84,
+            "post": 39,
+            "repost": 12
+          }
+        },
+        "diagnostic": {
+          "cost_usd": "0.0435913250",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 51,
+            "mean_belief_loss": 4.6
+          },
+          "action_counts": {
+            "inspect_status": 53,
+            "wait": 97,
+            "post": 30,
+            "repost": 20
+          }
+        }
+      }
+    },
+    {
+      "seed": 3007,
+      "cost_usd": "0.0902641250",
+      "branches": {
+        "diagnostic": {
+          "cost_usd": "0.0462854250",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 60,
+            "mean_belief_loss": 6.2
+          },
+          "action_counts": {
+            "inspect_status": 57,
+            "post": 40,
+            "wait": 84,
+            "repost": 19
+          }
+        },
+        "generic": {
+          "cost_usd": "0.0439787000",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 58,
+            "mean_belief_loss": 12.15
+          },
+          "action_counts": {
+            "inspect_status": 55,
+            "post": 39,
+            "wait": 88,
+            "repost": 18
+          }
+        }
+      }
+    },
+    {
+      "seed": 3008,
+      "cost_usd": "0.0874553750",
+      "branches": {
+        "generic": {
+          "cost_usd": "0.0422616500",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 53,
+            "mean_belief_loss": 13.75
+          },
+          "action_counts": {
+            "inspect_status": 54,
+            "post": 32,
+            "wait": 94,
+            "repost": 20
+          }
+        },
+        "diagnostic": {
+          "cost_usd": "0.0451937250",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 55,
+            "mean_belief_loss": 4.3
+          },
+          "action_counts": {
+            "inspect_status": 57,
+            "post": 40,
+            "wait": 89,
+            "repost": 14
+          }
+        }
+      }
+    },
+    {
+      "seed": 3009,
+      "cost_usd": "0.0870921250",
+      "branches": {
+        "diagnostic": {
+          "cost_usd": "0.0453058750",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 56,
+            "mean_belief_loss": 4.3
+          },
+          "action_counts": {
+            "inspect_status": 64,
+            "post": 33,
+            "wait": 81,
+            "repost": 22
+          }
+        },
+        "generic": {
+          "cost_usd": "0.0417862500",
+          "final": {
+            "step": 10,
+            "rumor_sharers": 1,
+            "rumor_reposts": 0,
+            "total_posts": 53,
+            "mean_belief_loss": 16.5
+          },
+          "action_counts": {
+            "inspect_status": 62,
+            "post": 43,
+            "wait": 86,
+            "repost": 9
+          }
+        }
+      }
+    }
+  ],
+  "artifacts_sha256": {
+    "report.json": "698a344a5e859262d9c715ce30baac6a8e5ca3a50ebbd8c9b3f47026b21b9c36",
+    "decisions.jsonl": "ac36bab3d5a18b6ab32cfda4c058a8ccf38264be5da95736194cdaf4780a633e",
+    "costs.jsonl": "697fd358af3429b1158a0d0807159446ac22e67eb15f5414d91f943ae84890ed",
+    "audit.json": "090bdf69683b880d4103b26f763011701000a1eb52b3e0d17df8cfb2dc58624e",
+    "provenance.json": "37b46c478fb9af9d1eb28d68c5fb5bf6e4d9a30388c8b836b63e8045bceac9b3"
+  },
+  "source_sha256_at_start": {
+    "worldlab/scenarios.py": "0a3807a1acb78f7475478a58dfd8d6bb267acb043c3687e990b811fb3e22d80c",
+    "worldlab/worker_setup.py": "f3441c9f5a0da20b9a96e05cbe9c6123780ef3d7a63b0ce7712a529d0cadb03d",
+    "worldlab/pilot_audit.py": "d3b791319093d885beacd459c4b76993cb94f7bec974dfd5a60fe08df9719bcb",
+    "worldlab/pilot.py": "b6e2ffb04aa17a3b8d349017710cdf7d5364bcb6e72cd46f7b7c7399f2ba2845",
+    "worldlab/experiment_catalog.py": "27f6e04099f298791c4606ee544a91fc4f82bd37cab51a44ea32a3ae80476a9c",
+    "worldlab/server.py": "28ac6a38bfd03710dd0fe667f9e307f9beec8e2213c4c7e83843861fe9244adf",
+    "worldlab/source_integrity.py": "c6472ea55b8852729402d1cc194af44eaedd2b7015103995a2346b4f18022dab",
+    "worldlab/oasis_worker.py": "cc62f18029059f430a7971556652d168242ecdde0541061b980e73099bd32ff8",
+    "worldlab/controller.py": "3a8914e8f3d8658975172d6e620d2f6c36c1a43796026f124f4fa79097546ff1",
+    "worldlab/audit.py": "a9db51153610d679703b18ecb4d0a8da619901a71c5aadfc8cd0170ac64fe80b",
+    "worldlab/scripted_agent.py": "4e5c5e416b396d5b26793479eb8729c8bafb66ec8be5df98090e2e79ea1a1e75",
+    "worldlab/models.py": "c20fa17e977155da8b1333ec26d99e39c3dbd95ca49f5663ebbf872064ad586a",
+    "worldlab/observations.py": "9de10dce901458cf2651be0cac5fa954c85ffc3c3195ced38c377f89f1440a8a",
+    "worldlab/incident.py": "5c6d6b3de893c519cd1a47f4714e8ce0396442022f21f1ea68f3c56cb2e7339e",
+    "worldlab/client.py": "9f5b79ff23bc2e441ea902b7591f65501384dbeac1285360d704ff48f5023738",
+    "worldlab/security.py": "927f32d98eaf734ec4f808b13feb3c0e7039d6856ed79a6d8ef442fb2ad563d7",
+    "worldlab/agent_server.py": "ced22fe171b9372f44b05f4dc28f8a8f5c965ebd863468ef49877931705b76cf",
+    "worldlab/campaign_catalog.py": "e9990529ac1cec36313d451c4506178828b1748e098b764576c6b9f88f2e4659",
+    "worldlab/__init__.py": "a01ba362a302f42e7d8b4be473c8f5628ffc9f4f1e79d9e24e8f6cde204623a2",
+    "worldlab/checkpoints.py": "b88374449403357fd376b44ad0a2effdd69e90758100221cda1efbc8310f905b",
+    "worldlab/campaign.py": "80460517c13ffd0afba83fe189c685a94eb8e6c4864a6b5cb4dd54e07d429673",
+    "worldlab/experiment.py": "585c6c1f5611f48e642c574f1c54cad02fa56f8b34a8e04cd39cbca91c071898",
+    "worldlab/rpc.py": "940f729c3701e0b6d5efca16799f8da5af3abe2813367aa950408f0ebf436b6d",
+    "worldlab/common.py": "50faf75ea8ed43f322b5a84e7fa7523e0232ca00f790477370973369572d007f",
+    "worldlab/campaign_report.py": "c2572a67799568b30114810a75c9f238955bf429b55133783bd11ae23bb74a36",
+    "worldlab/pilot_catalog.py": "ab1c3c0786b7b95dd8d1cb6c1a5ef5e698ed44eacba9addc083a1c896c57ff27",
+    "worldlab/costs.py": "5d689b786dc0ece08df408416ee3e5de885731d5699d5930d5c24ed3db9143c1",
+    "worldlab/reports.py": "4db048855893697683ef711c29a988a3aba1f5bcfa983f0a1be436ea591279b4",
+    "worldlab/environment.py": "3ea95401dd15e7627ac661aa705b8c4a67180a4b01662f3b0338dc151efc24b1",
+    "worldlab/society_policy.py": "944382189c7242e4950e666398133f846b4749387e21ebbde194e28543c2a5c2",
+    "worldlab/pilot_report.py": "7f99759fae5f8c54e4c2f810ba6b08994c3dc86e3fdc185e54f9dbe227a67db4",
+    "worldlab/society_contract.py": "8ab21533481cbf8a50ad99caa0d06ff3847fd0892052b49d45b25288da3b0095",
+    "worldlab/errors.py": "cc174d346b2afc1c1cf5954d88b8718689f33f60ad9cd69101d0fded7c94f07e",
+    "worldlab/society_server.py": "49226e662d6d24bf1359e38596975eea1b772c9e64d65fe295550cbc61eeb98d",
+    "worldlab/society_models.py": "d5019f19117251498d24f938fc3c508deb2b9bcbd45e62f4c951770ed5dd0a52",
+    "worldlab/ai_policy.py": "5ac27d66ff64959307d510ee9fde48d775bddfa573b9bc9680475bf83b38dc9b",
+    "web/pilot-report.html": "2e0d23082c92bfe9f7ef131b36192399365ef5e17676660907b190e59ca1248b",
+    "scripts/pilot": "3e2b8c8d6c682de16d7165baea1a5810fc4fa312babcfe214448992be1fdc647"
+  },
+  "tests": {
+    "full_suite": {
+      "passed": 121,
+      "elapsed_seconds": 315.77
+    },
+    "strengthened_auditor_regression": {
+      "passed": 1,
+      "elapsed_seconds": 25.87
+    }
+  },
+  "interpretation": "Both conditions had 161 reposts; no account reposted the initial message. The final self-reported probability of permanent loss averaged 15.6% in generic and 5.035% in diagnostic. This is model behavior in a synthetic fixture, not human validation.",
+  "cost_basis": "Provider-reported tokens × saved rates, including cache writes and reasoning within output. Not a final invoice; excludes local infrastructure, taxes and Codex credits.",
+  "privacy": "Full local receipts and observations remain in ignored data/pilots/. This compact recording contains no API credentials."
+}
