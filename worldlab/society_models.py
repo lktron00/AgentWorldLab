@@ -7,7 +7,7 @@ from .client import LabClient
 
 class AccountAction(BaseModel):
     model_config = ConfigDict(extra='forbid', strict=True)
-    kind: Literal['wait', 'post', 'repost', 'inspect_status']
+    kind: Literal['wait', 'post', 'repost', 'inspect_status', 'inspect_record']
     content: str = Field(default='', max_length=1000)
     post_id: int | None = Field(default=None, ge=1)
 

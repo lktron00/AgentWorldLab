@@ -266,3 +266,7 @@ The explicit paid runner controls every active account with GPT-6 Luna. Each pai
 ```
 
 This plans 4,000 model decisions and keeps one shared generation budget, including concurrent reservations. Set `OPENAI_API_KEY` in the private `.env` first. The offline default experiment remains free of model calls. Open `/campaigns` on the local server to find a pilot, inspect each account's observation/action, compare pairs and download usage receipts. See [the pilot guide](docs/all-ai-pilot.md) for accounting and limitations.
+
+### Balanced nine-case study (development branch)
+
+After the recorded Luna pilot, `./scripts/study --budget-total-usd 10` uses only the verified unspent remainder of that cumulative cap. Nine predeclared file, payment and software-integrity fixtures include real problems, false alarms, limited samples and stale/wrong-version evidence. Every active account decides with Luna. The local study dashboard exposes actions, observations, evidence references, paired Brier differences and exact usage allocations; a SQLite dataset and offline auditor support deeper analysis. See [the study guide](docs/multi-case-study.md).

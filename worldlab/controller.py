@@ -56,7 +56,7 @@ class OasisModule(EnvBase):
                 raise RuntimeError("Agent clock diverged from society")
             action = agent["intent"]
             if c.config.get("decision_mode") == "submitted" or action["kind"] != "wait":
-                social_action = {"kind": "wait"} if action["kind"] == "inspect_status" else action
+                social_action = {"kind": "wait"} if action["kind"] in {"inspect_status", "inspect_record"} else action
                 result = c.oasis.call("action", actor=aid, action=social_action, step=c.society.step_count + 1)
                 c.event(aid, action, result)
 

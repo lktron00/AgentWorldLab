@@ -39,7 +39,10 @@ def frame(snapshot, decisions=()):
             'mean_belief_loss': statistics.mean(beliefs) if beliefs else None}
 
 
-async def run(report, output, policy, ledger, url, token, *, concurrency=8):
+async def run(report, output, policy, ledger, url, token, *, concurrency=8, case=None, save_fn=persist, frame_fn=frame):
+    initial_receipts = len(ledger.receipts)
+    probability_field = "belief_problem" if case else "belief_loss"
+    from . import study_cases
     semaphore = asyncio.Semaphore(concurrency)
     config = report['config']
     async with SocietyClient(base_url=url, mode='simulation', message_timeout_s=180,
@@ -53,9 +56,9 @@ async def run(report, output, policy, ledger, url, token, *, concurrency=8):
 
         for index in range(report['requested_pairs']):
             seed = config['start_seed'] + index
-            identities = profiles(seed, config['population'])
+            identities = study_cases.profiles(case, seed) if case else profiles(seed, config['population'])
             initial = await reset(seed=seed, population=config['population'], policy='open',
-                                  scenario={'max_steps': config['steps'], 'initial_content': INITIAL_POST,
+                                  scenario={'max_steps': config['steps'], 'initial_content': case['post'] if case else INITIAL_POST,
                                             'decision_mode': 'submitted', 'feed_limit': 8})
             response = await operator.post(f"/lab/runs/{initial['run_id']}/checkpoint")
             response.raise_for_status()
@@ -64,7 +67,7 @@ async def run(report, output, policy, ledger, url, token, *, concurrency=8):
                     'initial_world_sha256': world_fingerprint(initial), 'profiles': identities, 'branches': {}}
             report['experiments'].append(pair)
             # Alternate execution order; condition never enters an account's model prompt.
-            order = BRANCHES if index % 2 == 0 else tuple(reversed(BRANCHES))
+            order = BRANCHES if (seed if case else index) % 2 == 0 else tuple(reversed(BRANCHES))
             pair['execution_order'] = order
             for branch_name in order:
                 snapshot = await reset(checkpoint_id=checkpoint)
@@ -74,16 +77,17 @@ async def run(report, output, policy, ledger, url, token, *, concurrency=8):
                 checks = {str(i): [] for i in range(1, config['population'] + 1)}
                 branch = {'run_id': snapshot['run_id'], 'status': 'running',
                           'initial_world_sha256': world_fingerprint(snapshot),
-                          'trajectory': [frame(snapshot)], 'world_sha256': [world_fingerprint(snapshot)],
+                          'trajectory': [frame_fn(snapshot)], 'world_sha256': [world_fingerprint(snapshot)],
                           'call_ids': [], 'action_counts': {}, 'cost_usd': usd(0)}
                 pair['branches'][branch_name] = branch
-                persist(output, report, ledger)
+                save_fn(output, report, ledger)
                 for step in range(config['steps']):
                     if snapshot['step'] != step or snapshot['done']:
                         raise RuntimeError('Unexpected society clock or horizon')
                     async def decide(actor):
                         key = str(actor)
-                        view = observation(snapshot, actor, identities[key], memory[key], checks[key])
+                        view = (study_cases.view(case, snapshot, actor, identities[key], memory[key], checks[key]) if case
+                                else observation(snapshot, actor, identities[key], memory[key], checks[key]))
                         async with semaphore:
                             action, receipt = await policy.decide(view, seed=seed, branch=branch_name,
                                                                   actor=actor, step=step)
@@ -98,7 +102,7 @@ async def run(report, output, policy, ledger, url, token, *, concurrency=8):
                     results = await asyncio.gather(*(decide(i) for i in range(1, config['population'] + 1)), return_exceptions=True)
                     # Finish and record in-flight paid requests even when a sibling request fails.
                     errors = [r for r in results if isinstance(r, BaseException)]
-                    persist(output, report, ledger)
+                    save_fn(output, report, ledger)
                     if errors:
                         raise errors[0]
                     decisions = sorted(results, key=lambda d: d['actor'])
@@ -113,33 +117,33 @@ async def run(report, output, policy, ledger, url, token, *, concurrency=8):
                         'world_sha256': world_fingerprint(snapshot)})
                     for d in decisions:
                         key = str(d['actor'])
-                        remember = {'step': step, 'action': d['action'], 'reason': d['reason'], 'belief_loss': d['belief_loss']}
-                        if d['action']['kind'] == 'inspect_status':
-                            check = {'requested_at_step': step, 'result': status_result(branch_name, step)}
+                        remember = {'step': step, 'action': d['action'], 'reason': d['reason'], probability_field: d[probability_field]}
+                        if d['action']['kind'] in {'inspect_status', 'inspect_record'}:
+                            check = {'requested_at_step': step, 'result': (study_cases.tool_result(case, branch_name, d['action']['kind'], step, d['actor']) if case else status_result(branch_name, step))}
                             checks[key].append(check)
                             append_decision(output / 'decisions.jsonl', {'event': 'status_result', 'decision_id': d['decision_id'], **check})
                         memory[key].append(remember)
                     counts = Counter(branch['action_counts'])
                     counts.update(d['action']['kind'] for d in decisions)
                     branch['action_counts'] = dict(counts)
-                    branch['trajectory'].append(frame(snapshot, decisions))
+                    branch['trajectory'].append(frame_fn(snapshot, decisions))
                     branch['world_sha256'].append(world_fingerprint(snapshot))
-                    if ledger.summary()['completed_calls'] >= 100 and 'calibration' not in report:
+                    if case is None and ledger.summary()['completed_calls'] >= 100 and 'calibration' not in report:
                         used = ledger.summary()
                         report['calibration'] = {**used, 'decisions_sampled': used['completed_calls'],
                             'projected_cost_usd_at_same_average': usd(ledger.spent / used['completed_calls'] * report['progress']['planned_decisions']),
                             'note': 'Extrapolación del primer tramo; la memoria y el feed pueden aumentar el consumo.'}
-                    persist(output, report, ledger)
+                    save_fn(output, report, ledger)
                     print(f"seed={seed} branch={branch_name} tick={step+1}/{config['steps']} "
                           f"decisions={report['decisions']} api_usd={usd(ledger.spent)} unresolved={len(ledger.pending)}", flush=True)
                 branch['status'] = 'completed'
                 branch['final_world_sha256'] = world_fingerprint(snapshot)
                 write_json(output / f'world-{seed}-{branch_name}.json', snapshot)
-                persist(output, report, ledger)
+                save_fn(output, report, ledger)
             pair['status'] = 'completed'
-            persist(output, report, ledger)
+            save_fn(output, report, ledger)
     expected = config['population'] * config['steps'] * report['requested_pairs'] * 2
-    if report['decisions'] != expected or ledger.summary()['completed_calls'] != expected or ledger.pending:
+    if report['decisions'] != expected or (case is None and ledger.summary()['completed_calls'] - initial_receipts != expected) or ledger.pending:
         raise RuntimeError('A complete pilot requires exactly one accounted model decision per account and tick')
     report['status'] = 'completed'
 

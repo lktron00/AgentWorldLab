@@ -26,7 +26,7 @@ def receipt_for(model, response, price_book, call_id, latency_ms=0):
             "latency_ms": latency_ms}
 
 
-def audit_ledger(path: Path):
+def audit_ledger(path: Path, *, maximum=128 * 1024 * 1024):
     """Reconstruct receipts from saved responses, never invent zero-cost failures.
 
     A response may be durable even if the process died before the charged event.
@@ -35,8 +35,8 @@ def audit_ledger(path: Path):
     """
     if path.is_symlink() or not path.is_file():
         raise AuditError("Expected a local costs.jsonl file, not a symbolic link")
-    if path.stat().st_size > 128 * 1024 * 1024:
-        raise AuditError("Cost journal exceeds the 128 MiB audit limit")
+    if path.stat().st_size > maximum:
+        raise AuditError("Cost journal exceeds the configured audit limit")
     header = None
     calls = {}
     warnings = []

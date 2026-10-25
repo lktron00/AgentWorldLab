@@ -20,7 +20,7 @@ def validate_batch(snapshot, actions, expected_step):
         if not isinstance(action, dict) or set(action) != {'kind', 'content', 'post_id'}:
             raise ValueError('Only kind, content and post_id are permitted')
         kind, content, post = action['kind'], action['content'], action['post_id']
-        if kind not in {'wait', 'post', 'repost', 'inspect_status'} or not isinstance(content, str):
+        if kind not in {'wait', 'post', 'repost', 'inspect_status', 'inspect_record'} or not isinstance(content, str):
             raise ValueError('Invalid account action')
         if kind == 'post':
             if not 1 <= len(content.strip()) <= 1000 or post is not None:
