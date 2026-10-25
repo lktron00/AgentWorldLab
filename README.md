@@ -256,3 +256,13 @@ Contributions are welcome: [CONTRIBUTING.md](CONTRIBUTING.md),
 ## License
 
 New project code: Apache-2.0. AgentSociety 2 and OASIS: Apache-2.0. OpenEnv: BSD-3-Clause. See `THIRD_PARTY_NOTICES.md`. MiroFish source is not included in this project.
+
+## All-AI incident pilot (development branch)
+
+The explicit paid runner controls every active account with GPT-6 Luna. Each pair starts from the same checkpoint, with the same roles and goals. The two conditions differ only in the information returned by an optional status-page consultation. No scripted sharing multiplier or cautious-sharing policy is used in this pilot.
+
+```sh
+./scripts/pilot --population 20 --steps 10 --pairs 10 --budget-usd 10
+```
+
+This plans 4,000 model decisions and keeps one shared generation budget, including concurrent reservations. Set `OPENAI_API_KEY` in the private `.env` first. The offline default experiment remains free of model calls. Open `/campaigns` on the local server to find a pilot, inspect each account's observation/action, compare pairs and download usage receipts. See [the pilot guide](docs/all-ai-pilot.md) for accounting and limitations.

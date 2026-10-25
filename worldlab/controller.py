@@ -55,8 +55,9 @@ class OasisModule(EnvBase):
             if agent["step_count"] != c.society.step_count + 1:
                 raise RuntimeError("Agent clock diverged from society")
             action = agent["intent"]
-            if action["kind"] != "wait":
-                result = c.oasis.call("action", actor=aid, action=action, step=c.society.step_count + 1)
+            if c.config.get("decision_mode") == "submitted" or action["kind"] != "wait":
+                social_action = {"kind": "wait"} if action["kind"] == "inspect_status" else action
+                result = c.oasis.call("action", actor=aid, action=social_action, step=c.society.step_count + 1)
                 c.event(aid, action, result)
 
 
@@ -168,6 +169,8 @@ class Controller:
             raise RuntimeError("Reset or restore a checkpoint before continuing")
         if self.society.step_count >= self.config["max_steps"]:
             raise ValueError("Episode finished; reset to start another")
+        if self.config.get("decision_mode") == "submitted":
+            raise ValueError("Submitted societies require a complete society_step batch")
         # Reject an invalid external action before changing either engine.
         if restricted:
             from .observations import agent_view, validate_agent_action
@@ -207,6 +210,30 @@ class Controller:
                 traceback.print_exc(file=sys.stderr)
             raise
 
+    async def society_step(self, actions, expected_step):
+        from .society_contract import validate_batch
+        if self.society is None or self.failed:
+            raise RuntimeError("Reset or restore a checkpoint before continuing")
+        if self.config.get("decision_mode") != "submitted":
+            raise ValueError("society_step requires decision_mode=submitted")
+        snapshot = self.snapshot()
+        # Validate ALL proposals against the same immutable pre-tick world.
+        submitted = validate_batch(snapshot, actions, expected_step)
+        try:
+            self.proxy.env = {"snapshot": snapshot["world"], "seed": self.config["seed"],
+                              "step": self.society.step_count, "policy": self.config["policy"],
+                              "scenario": self.config, "submitted_actions": submitted}
+            await self.society.step(TICK_SECONDS)
+            state = self.snapshot()
+            self.save_frame(state)
+            return state
+        except Exception as exc:
+            self.failed = True
+            last = read_json(self.run_dir / "latest.json")
+            last.update(status="failed", error=str(exc))
+            write_json(self.run_dir / "latest.json", last)
+            raise
+
     async def checkpoint(self):
         if self.society is None or self.failed:
             raise RuntimeError("Only a healthy paused world can be checkpointed")
@@ -226,7 +253,7 @@ class Controller:
     @staticmethod
     def adapter_hashes():
         return {name: hashlib.sha256((ROOT / "worldlab" / name).read_bytes()).hexdigest()
-                for name in ("common.py", "scripted_agent.py", "controller.py", "oasis_worker.py", "checkpoints.py", "scenarios.py", "observations.py")}
+                for name in ("common.py", "scripted_agent.py", "controller.py", "oasis_worker.py", "checkpoints.py", "scenarios.py", "observations.py", "society_contract.py")}
 
     async def close_world(self, keep_oasis=False):
         if self.society:
@@ -255,6 +282,8 @@ async def main():
                     result = await controller.reset(**request)
                 elif command == "step":
                     result = await controller.step(request["action"], restricted=request.get("restricted", False))
+                elif command == "society_step":
+                    result = await controller.society_step(request["actions"], request["expected_step"])
                 elif command == "state":
                     result = controller.snapshot()
                 elif command == "checkpoint":

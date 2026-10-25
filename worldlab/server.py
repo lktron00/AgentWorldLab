@@ -19,6 +19,7 @@ from .models import LabAction, LabObservation, LabState
 from .security import LocalAccessMiddleware
 from .experiment_catalog import router as experiment_router
 from .campaign_catalog import router as campaign_router
+from .pilot_catalog import router as pilot_router
 
 app = create_app(LabEnvironment, LabAction, LabObservation, env_name="agent_world_lab",
                  max_concurrent_envs=2, state_cls=LabState)
@@ -26,6 +27,7 @@ app.version = __version__
 app.add_middleware(LocalAccessMiddleware)
 app.include_router(experiment_router)
 app.include_router(campaign_router)
+app.include_router(pilot_router)
 app.mount("/assets", StaticFiles(directory=ROOT / "web"), name="assets")
 
 

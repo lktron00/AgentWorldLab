@@ -87,7 +87,7 @@ def save_report(output, report, ledger):
 
 
 @contextmanager
-def experiment_server(output, *, reuse_oasis=False):
+def experiment_server(output, *, reuse_oasis=False, society=False):
     """Credentials are process-local and never written to reports or command lines."""
     operator, agent = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
     with socket.socket() as candidate:
@@ -96,11 +96,12 @@ def experiment_server(output, *, reuse_oasis=False):
     server_env = dict(os.environ, PORT=str(port), WORLDLAB_DATA=str(output / "engine"),
                       WORLDLAB_OPERATOR_TOKEN=operator, WORLDLAB_AGENT_TOKEN=agent,
                       WORLDLAB_REUSE_OASIS="1" if reuse_oasis else "0")
+    server_env.pop("WORLDLAB_SOCIETY", None)
     server_env.pop("OPENAI_API_KEY", None)
     server_env.pop("OPENAI_BASE_URL", None)
     url = f"http://127.0.0.1:{port}"
     with (output / "server.log").open("w") as log:
-        process = subprocess.Popen([sys.executable, "-m", "worldlab.agent_server"], cwd=ROOT,
+        process = subprocess.Popen([sys.executable, "-m", "worldlab.society_server" if society else "worldlab.agent_server"], cwd=ROOT,
                                    env=server_env, stdout=log, stderr=log)
         try:
             with httpx.Client(timeout=2, trust_env=False) as http:
