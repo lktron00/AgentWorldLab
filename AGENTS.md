@@ -8,3 +8,4 @@
 - Do not claim scientific validity from the toy diffusion scenario.
 - Never edit `vendor/` implicitly. Pin deliberate upstream upgrades in `upstreams.json`, refresh the appropriate runtime lock and run integration tests.
 - Keep the native server bound to loopback until authentication and tenant isolation are implemented. Containers may listen on their isolated network, but host port publishing must use `127.0.0.1` (as in `compose.yaml`). Never recommend public hosting.
+- The public web application is maintained in https://github.com/lktron00/AgentWorldLab-Web. Keep authoritative engine code and public reproducible examples here; web UX/build changes belong there.
