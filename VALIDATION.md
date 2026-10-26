@@ -115,8 +115,8 @@ No additional paid provider calls were made for these acceptance checks.
 ## Public results explorer — 2026-10-25
 
 [Public site](https://agent-world-lab-explorer.lktron.chatgpt.site) ·
-[verification record](docs/explorer-validation.json) ·
-[map semantics and reproducible build](docs/public-explorer.md).
+[verification record](https://github.com/lktron00/AgentWorldLab-Web/blob/main/docs/explorer-validation.json) ·
+[map semantics and reproducible build](https://github.com/lktron00/AgentWorldLab-Web/blob/main/docs/public-explorer.md).
 
 - Five Node model tests passed: bounded shared routes, deterministic finite
   layout, exact-turn observations, branch/turn isolation for reposts and colors.
@@ -137,5 +137,11 @@ No additional paid provider calls were made for these acceptance checks.
   sanitized recordings are hosted; the native simulator remains on loopback.
 
 The native engine code and runtime contracts are unchanged in this addition.
-The existing GitHub workflow also runs the new frontend tests and full explorer
-verification before the real-engine integration suite.
+The frontend tests and explorer verification moved to AgentWorldLab-Web; this
+repository retains the real-engine and public-recording checks.
+
+The public explorer source was subsequently extracted to
+[AgentWorldLab-Web](https://github.com/lktron00/AgentWorldLab-Web). The original
+recorded datasets remain here. The public URL and shared view parameters are
+preserved; the web pins engine revision `8a459558b6d5c95eb16b57f0123d6c66ec8129af`
+and verifies every consumed public input hash.

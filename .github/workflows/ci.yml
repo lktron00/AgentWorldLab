@@ -29,20 +29,11 @@ jobs:
           cache-dependency-glob: |
             requirements/*.txt
             upstreams.json
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: "22"
       - name: Verify reproducible recorded report
         run: |
           python3 scripts/build-example-report.py --check
           python3 scripts/build-campaign-example.py --check
           python3 scripts/build-study-example.py --check
-      - name: Verify public network explorer
-        run: |
-          node --check explorer/app.mjs
-          node --test explorer/test-model.mjs
-          python3 scripts/build-explorer.py
-          python3 scripts/build-explorer.py --check
       - name: Native libraries
         run: sudo apt-get update && sudo apt-get install -y build-essential libmagic1 libcairo2 libgomp1
       - name: Install immutable upstreams and isolated runtimes
